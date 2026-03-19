@@ -217,15 +217,29 @@
   <!-- HEADER -->
   <header class="header">
     <nav class="nav" aria-label="Primary navigation">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+      </button>
       <a href="index.html" class="nav-link">Home</a>
       <a href="playground.html" class="nav-link">Playground</a>
       <a href="resume.html" class="nav-link active">Resume</a>
     </nav>
     <a href="index.html" class="logo-dot"></a>
     <div class="header-right">
-      <button class="btn-dark">Get in Touch</button>
+      <a href="mailto:danilophinic@gmail.com" class="btn-dark">Get in Touch</a>
     </div>
   </header>
+
+  <!-- Mobile navigation overlay -->
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-menu-nav">
+      <a href="index.html" class="mobile-menu-link">Home</a>
+      <a href="playground.html" class="mobile-menu-link">Playground</a>
+      <a href="resume.html" class="mobile-menu-link active">Resume</a>
+    </nav>
+  </div>
 
   <main>
     <article class="resume">

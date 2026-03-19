@@ -1,3 +1,39 @@
+/* ── Mobile menu toggle ──────────────────────────────────────────── */
+(function () {
+  const toggle = document.getElementById('menuToggle');
+  const menu   = document.getElementById('mobileMenu');
+  if (!toggle || !menu) return;
+
+  function openMenu() {
+    menu.classList.add('is-open');
+    toggle.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden'; // prevent scroll behind menu
+  }
+
+  function closeMenu() {
+    menu.classList.remove('is-open');
+    toggle.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  toggle.addEventListener('click', () => {
+    menu.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+
+  // Close when a menu link is clicked
+  menu.querySelectorAll('.mobile-menu-link').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('is-open')) closeMenu();
+  });
+})();
+
+/* ── Page transitions ────────────────────────────────────────────── */
 (function () {
   const overlay = document.getElementById('page-transition');
   const box     = overlay && overlay.querySelector('.transition-box');
