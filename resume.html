@@ -13,59 +13,162 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    .resume {
-      max-width: 900px;
+
+    /* ── Page wrapper ── */
+    .rv2 {
+      max-width: 820px;
       margin: 0 auto;
-      padding: 120px 40px 140px;
+      /* matches home page: header ~120px + same breathing room as hero */
+      padding: 120px 40px 120px;
     }
 
-    /* ── Scroll-reveal ── */
-    .reveal {
+    /* ── Scroll reveal ── */
+    .rv2-reveal {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(18px);
       transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
                   transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .rv2-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
-    /* ── Sections ── */
-    .resume-section {
-      padding: 72px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    /* ────────────────────────────────────────────
+       INTRO
+    ──────────────────────────────────────────── */
+    .rv2-intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      padding-bottom: 48px;
+      margin-bottom: 64px;
     }
-    .resume-section:first-child { border-top: none; padding-top: 0; }
 
-    .section-label {
-      font-size: 12px;
+    .rv2-name {
+      font-family: 'General Sans', 'DM Sans', 'Inter', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .rv2-title {
+      font-size: 17px;
+      color: rgba(255, 255, 255, 0.45);
+      font-weight: 400;
+    }
+
+    .rv2-contact {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .rv2-contact a,
+    .rv2-contact span {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.38);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .rv2-contact a:hover { color: var(--white); }
+
+    /* ────────────────────────────────────────────
+       SECTION
+    ──────────────────────────────────────────── */
+    .rv2-section {
+      margin-bottom: 64px;
+    }
+    .rv2-section:last-child { margin-bottom: 0; }
+
+    .rv2-section-label {
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--green);
-      margin-bottom: 52px;
+      margin-bottom: 32px;
     }
 
-    /* ── Experience entries ── */
-    .entry-list { display: flex; flex-direction: column; gap: 72px; }
-
-    .entry {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 0 48px;
+    /* ────────────────────────────────────────────
+       EXPERIENCE ENTRIES
+    ──────────────────────────────────────────── */
+    .rv2-entry-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
 
-    .entry-meta { padding-top: 5px; }
+    .rv2-entry {
+      padding: 32px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .rv2-entry:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .rv2-entry:last-child {
+      border-bottom: none;
+    }
 
-    .entry-period {
+    /* Row: company + role left / date right */
+    .rv2-entry-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .rv2-entry-left {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rv2-company {
+      font-family: 'General Sans', 'DM Sans', 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--white);
+    }
+    .rv2-company a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .rv2-company a:hover {
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .rv2-role {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.38);
+      font-weight: 400;
+    }
+
+    .rv2-entry-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .rv2-date {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.35);
-      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.28);
+      white-space: nowrap;
       font-variant-numeric: tabular-nums;
     }
 
-    .badge-current {
+    .rv2-badge {
       display: inline-block;
-      margin-top: 10px;
-      padding: 3px 10px;
+      padding: 2px 9px;
       background: var(--green);
       color: var(--black);
       font-size: 10px;
@@ -75,141 +178,129 @@
       text-transform: uppercase;
     }
 
-    .entry-role {
-      font-family: 'General Sans', 'DM Sans', sans-serif;
-      font-size: 24px;
-      font-weight: 500;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    .entry-company {
+    .rv2-summary {
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.4);
-      margin-bottom: 20px;
-    }
-    .entry-company a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .entry-company a:hover {
-      color: var(--white);
-      border-color: rgba(255, 255, 255, 0.4);
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.48);
+      margin-bottom: 16px;
     }
 
-    .entry-summary {
-      font-size: 16px;
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.5);
-      margin-bottom: 20px;
-    }
-
-    .entry-bullets {
+    .rv2-bullets {
       list-style: none;
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 9px;
     }
-    .entry-bullets li {
+    .rv2-bullets li {
       position: relative;
-      padding-left: 20px;
-      font-size: 15px;
-      line-height: 1.65;
-      color: rgba(255, 255, 255, 0.38);
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.32);
     }
-    .entry-bullets li::before {
+    .rv2-bullets li::before {
       content: '–';
       position: absolute;
       left: 0;
       color: var(--green);
-      opacity: 0.7;
+      opacity: 0.6;
     }
 
-    /* ── Skills ── */
-    .skills-wrap {
+    /* ────────────────────────────────────────────
+       SKILLS
+    ──────────────────────────────────────────── */
+    .rv2-skills {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
-    .skill-tag {
-      padding: 9px 18px;
+    .rv2-skill {
+      padding: 7px 16px;
       background: var(--dark-card);
       border-radius: 100px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.55);
       letter-spacing: 0.02em;
       transition: background 0.15s, color 0.15s;
     }
-    .skill-tag:hover { background: #333330; color: var(--white); }
+    .rv2-skill:hover { background: #333330; color: var(--white); }
 
-    /* ── Education ── */
-    .edu-list { display: flex; flex-direction: column; }
-    .edu-entry {
+    /* ────────────────────────────────────────────
+       EDUCATION + AWARDS (2-col grid)
+    ──────────────────────────────────────────── */
+    .rv2-two-col {
       display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 0 48px;
-      padding: 28px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
     }
-    .edu-entry:first-child { border-top: 1px solid rgba(255, 255, 255, 0.06); }
-    .edu-period {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.35);
-      padding-top: 4px;
+
+    .rv2-edu-list,
+    .rv2-award-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
     }
-    .edu-degree {
-      font-family: 'General Sans', 'DM Sans', sans-serif;
-      font-size: 20px;
+
+    .rv2-edu-entry,
+    .rv2-award-entry { display: flex; flex-direction: column; gap: 4px; }
+
+    .rv2-edu-degree,
+    .rv2-award-name {
+      font-family: 'General Sans', 'DM Sans', 'Inter', sans-serif;
+      font-size: 16px;
       font-weight: 500;
       color: var(--white);
-      margin-bottom: 5px;
-    }
-    .edu-school {
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.3;
     }
 
-    /* ── Award ── */
-    .award-entry {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 0 48px;
-    }
-    .award-date {
+    .rv2-edu-school,
+    .rv2-award-org {
       font-size: 13px;
       color: rgba(255, 255, 255, 0.35);
-      padding-top: 4px;
     }
-    .award-name {
-      font-family: 'General Sans', 'DM Sans', sans-serif;
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--white);
-      margin-bottom: 6px;
+
+    .rv2-edu-period,
+    .rv2-award-date {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.22);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
     }
-    .award-org { font-size: 15px; color: rgba(255, 255, 255, 0.4); }
 
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .resume { padding: 100px 20px 80px; }
+    /* ────────────────────────────────────────────
+       RESPONSIVE
+    ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .rv2 { padding: 100px 20px 80px; }
 
-      .entry,
-      .edu-entry,
-      .award-entry {
-        grid-template-columns: 1fr;
-        gap: 8px;
+      .rv2-intro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding-bottom: 36px;
+        margin-bottom: 48px;
+      }
+      .rv2-contact { align-items: flex-start; }
+
+      .rv2-entry-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
       }
 
-      .entry-meta { display: flex; align-items: center; gap: 14px; }
-      .badge-current { margin-top: 0; }
-      .entry-list { gap: 52px; }
-      .resume-section { padding: 52px 0; }
+      .rv2-two-col {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
     }
+
+    @media (max-width: 480px) {
+      .rv2-entry-left { flex-direction: column; gap: 3px; }
+      .rv2-name { font-size: 32px; }
+    }
+
   </style>
 </head>
 <body>
@@ -242,133 +333,135 @@
   </div>
 
   <main>
-    <article class="resume">
+    <article class="rv2">
+
+      <!-- ── INTRO ── -->
+      <header class="rv2-intro rv2-reveal">
+        <div>
+          <h1 class="rv2-name">Danilo Hinić</h1>
+          <p class="rv2-title">UX / UI Designer</p>
+        </div>
+        <div class="rv2-contact">
+          <a href="mailto:danilophinic@gmail.com">danilophinic@gmail.com</a>
+          <span>Belgrade, Serbia</span>
+          <span>4+ years experience</span>
+        </div>
+      </header>
 
       <!-- ── EXPERIENCE ── -->
-      <section class="resume-section reveal">
-        <p class="section-label">Experience</p>
-        <div class="entry-list">
+      <section class="rv2-section rv2-reveal">
+        <p class="rv2-section-label">Experience</p>
+        <div class="rv2-entry-list">
 
-          <div class="entry">
-            <div class="entry-meta">
-              <p class="entry-period">Mar 2024<br>Present</p>
-              <span class="badge-current">Current</span>
+          <div class="rv2-entry">
+            <div class="rv2-entry-header">
+              <div class="rv2-entry-left">
+                <span class="rv2-company">
+                  <a href="https://www.supercluster.studio" target="_blank" rel="noopener noreferrer">SuperCluster Studio</a>
+                </span>
+                <span class="rv2-role">UX/UI Designer</span>
+              </div>
+              <div class="rv2-entry-right">
+                <span class="rv2-date">Mar 2024 – Present</span>
+                <span class="rv2-badge">Current</span>
+              </div>
             </div>
-            <div>
-              <h2 class="entry-role">UX/UI Designer</h2>
-              <p class="entry-company">
-                <a href="https://www.supercluster.studio" target="_blank" rel="noopener noreferrer">SuperCluster Studio</a>
-                &nbsp;— Belgrade
-              </p>
-              <p class="entry-summary">Working as part of a design studio, mostly focused on designing for furniture e-commerce brands.</p>
-              <ul class="entry-bullets">
-                <li>Designing e-commerce platforms for furniture brands, enhancing user experience and driving online traffic and sales.</li>
-                <li>Designing interactive configurators for furniture, allowing customers to customise products in real-time.</li>
-                <li>Working on design projects for high-profile clients, delivering top-notch digital experiences.</li>
-                <li>Creating wireframes, prototypes, and high-fidelity mockups to communicate design ideas effectively.</li>
-                <li>Managing multiple projects simultaneously, meeting tight deadlines and exceeding client expectations.</li>
-                <li>Staying updated on the latest design trends and tools, continuously improving skills and knowledge.</li>
-              </ul>
-            </div>
+            <p class="rv2-summary">Design studio focused on furniture e-commerce — delivering polished digital experiences for high-profile brands.</p>
+            <ul class="rv2-bullets">
+              <li>E-commerce platforms for furniture brands, driving online traffic and sales</li>
+              <li>Interactive product configurators allowing real-time customisation</li>
+              <li>Wireframes, prototypes, and high-fidelity mockups across multiple simultaneous projects</li>
+            </ul>
           </div>
 
-          <div class="entry">
-            <div class="entry-meta">
-              <p class="entry-period">Oct 2022<br>Mar 2024</p>
+          <div class="rv2-entry">
+            <div class="rv2-entry-header">
+              <div class="rv2-entry-left">
+                <span class="rv2-company">Bureau 22</span>
+                <span class="rv2-role">UX/UI Designer</span>
+              </div>
+              <div class="rv2-entry-right">
+                <span class="rv2-date">Oct 2022 – Mar 2024</span>
+              </div>
             </div>
-            <div>
-              <h2 class="entry-role">UX/UI Designer</h2>
-              <p class="entry-company">Bureau 22 &nbsp;— Belgrade</p>
-              <p class="entry-summary">Working as part of the UX/UI team to develop innovative design concepts and enhance user experience flows for global clients.</p>
-              <ul class="entry-bullets">
-                <li>Refreshed outdated team designs, enhancing their visual appeal and functionality.</li>
-                <li>Led the development of websites and applications at the Bureau, transforming concepts into fully realised products.</li>
-                <li>Leveraged Figma extensively to create visually engaging and user-centric designs.</li>
-                <li>Utilised WordPress and occasional coding to bring variety and flexibility to projects.</li>
-                <li>Continuously researched emerging design trends and incorporated innovative ideas into my work.</li>
-                <li>Maintained a proactive approach, consistently pushing creative boundaries and delivering results.</li>
-                <li>Thrived in dynamic, fast-paced environments, adapting to diverse client requirements and perspectives.</li>
-                <li>Strengthened collaboration skills by giving and receiving constructive feedback effectively.</li>
-                <li>Conducted thorough quality assurance to ensure design alignment with development outcomes.</li>
-                <li>Managed client communications, kept projects on schedule, and contributed to team efforts in design and development to ensure seamless workflows.</li>
-              </ul>
-            </div>
+            <p class="rv2-summary">UX/UI team working on innovative design concepts and user experience flows for global clients.</p>
+            <ul class="rv2-bullets">
+              <li>Led end-to-end development of websites and web applications, from concept to delivery</li>
+              <li>Refreshed outdated designs with modern visual language and component systems</li>
+              <li>Managed client communications, QA, and timelines across fast-paced projects</li>
+            </ul>
           </div>
 
-          <div class="entry">
-            <div class="entry-meta">
-              <p class="entry-period">Mar 2022<br>Sep 2022</p>
+          <div class="rv2-entry">
+            <div class="rv2-entry-header">
+              <div class="rv2-entry-left">
+                <span class="rv2-company">Art Storefronts</span>
+                <span class="rv2-role">UX/UI Designer &nbsp;·&nbsp; Freelance</span>
+              </div>
+              <div class="rv2-entry-right">
+                <span class="rv2-date">Mar 2022 – Sep 2022</span>
+              </div>
             </div>
-            <div>
-              <h2 class="entry-role">UX/UI Designer <span style="font-weight:400;color:rgba(255,255,255,0.3);font-size:18px;">— Freelance</span></h2>
-              <p class="entry-company">Art Storefronts &nbsp;— Austin, TX</p>
-              <p class="entry-summary">Working with the design team to upgrade the platform's overall look and feel.</p>
-              <ul class="entry-bullets">
-                <li>Revitalised outdated team designs, modernising their look and functionality.</li>
-                <li>Designed fresh themes and updated classic styles to maintain a sharp and cohesive aesthetic.</li>
-                <li>Collaborated closely with front-end developers to fine-tune and optimise designs.</li>
-                <li>Enhanced the platform's landing page to create a strong and memorable first impression.</li>
-                <li>Conducted design audits for client websites, identifying areas for improvement and providing actionable recommendations.</li>
-              </ul>
-            </div>
+            <p class="rv2-summary">Upgraded the platform's overall look and feel, working with the design and development teams remotely.</p>
+            <ul class="rv2-bullets">
+              <li>Designed fresh themes and modernised existing styles for a cohesive aesthetic</li>
+              <li>Enhanced the platform's landing page for a stronger first impression</li>
+              <li>Collaborated with front-end developers to fine-tune and optimise designs</li>
+            </ul>
           </div>
 
         </div>
       </section>
 
       <!-- ── SKILLS ── -->
-      <section class="resume-section reveal">
-        <p class="section-label">Skills &amp; Tools</p>
-        <div class="skills-wrap">
-          <span class="skill-tag">UX / UI Design</span>
-          <span class="skill-tag">Figma</span>
-          <span class="skill-tag">Webflow</span>
-          <span class="skill-tag">Wireframing</span>
-          <span class="skill-tag">Prototyping</span>
-          <span class="skill-tag">Branding</span>
-          <span class="skill-tag">Graphic Design</span>
-          <span class="skill-tag">HTML</span>
-          <span class="skill-tag">CSS</span>
-          <span class="skill-tag">WordPress</span>
-          <span class="skill-tag">Elementor</span>
-          <span class="skill-tag">Adobe Illustrator</span>
-          <span class="skill-tag">Adobe InDesign</span>
-          <span class="skill-tag">Adobe Photoshop</span>
-          <span class="skill-tag">ChatGPT</span>
-          <span class="skill-tag">Print</span>
+      <section class="rv2-section rv2-reveal">
+        <p class="rv2-section-label">Skills &amp; Tools</p>
+        <div class="rv2-skills">
+          <span class="rv2-skill">UX / UI Design</span>
+          <span class="rv2-skill">Figma</span>
+          <span class="rv2-skill">Webflow</span>
+          <span class="rv2-skill">Wireframing</span>
+          <span class="rv2-skill">Prototyping</span>
+          <span class="rv2-skill">Branding</span>
+          <span class="rv2-skill">Graphic Design</span>
+          <span class="rv2-skill">HTML</span>
+          <span class="rv2-skill">CSS</span>
+          <span class="rv2-skill">WordPress</span>
+          <span class="rv2-skill">Elementor</span>
+          <span class="rv2-skill">Adobe Illustrator</span>
+          <span class="rv2-skill">Adobe InDesign</span>
+          <span class="rv2-skill">Adobe Photoshop</span>
+          <span class="rv2-skill">ChatGPT</span>
+          <span class="rv2-skill">Print</span>
         </div>
       </section>
 
-      <!-- ── EDUCATION ── -->
-      <section class="resume-section reveal">
-        <p class="section-label">Education</p>
-        <div class="edu-list">
-          <div class="edu-entry">
-            <p class="edu-period">2014 – 2022</p>
-            <div>
-              <h2 class="edu-degree">Bachelor's Degree in Information Technology</h2>
-              <p class="edu-school">ITS — Information Technology School, Belgrade</p>
-            </div>
-          </div>
-          <div class="edu-entry">
-            <p class="edu-period">2010 – 2014</p>
-            <div>
-              <h2 class="edu-degree">High School Diploma in Languages &amp; Art</h2>
-              <p class="edu-school">Gymnasium Vuk Karadžić, Trstenik</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- ── EDUCATION + AWARDS ── -->
+      <section class="rv2-section rv2-reveal">
+        <p class="rv2-section-label">Education &amp; Awards</p>
+        <div class="rv2-two-col">
 
-      <!-- ── AWARDS ── -->
-      <section class="resume-section reveal">
-        <p class="section-label">Awards</p>
-        <div class="award-entry">
-          <p class="award-date">July 2018</p>
-          <div>
-            <h2 class="award-name">1st Place — Design of Advertising Material</h2>
-            <p class="award-org">Agriculture Fair &nbsp;·&nbsp; Delta Agrar, Novi Sad</p>
+          <div class="rv2-edu-list">
+            <div class="rv2-edu-entry">
+              <p class="rv2-edu-degree">Bachelor's in Information Technology</p>
+              <p class="rv2-edu-school">ITS — Information Technology School, Belgrade</p>
+              <p class="rv2-edu-period">2014 – 2022</p>
+            </div>
+            <div class="rv2-edu-entry">
+              <p class="rv2-edu-degree">High School Diploma in Languages &amp; Art</p>
+              <p class="rv2-edu-school">Gymnasium Vuk Karadžić, Trstenik</p>
+              <p class="rv2-edu-period">2010 – 2014</p>
+            </div>
           </div>
+
+          <div class="rv2-award-list">
+            <div class="rv2-award-entry">
+              <p class="rv2-award-name">1st Place — Design of Advertising Material</p>
+              <p class="rv2-award-org">Agriculture Fair &nbsp;·&nbsp; Delta Agrar, Novi Sad</p>
+              <p class="rv2-award-date">July 2018</p>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -388,7 +481,7 @@
         }
       });
     }, { threshold: 0.06 });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    document.querySelectorAll('.rv2-reveal').forEach(el => io.observe(el));
   </script>
   <script src="transition.js"></script>
 
