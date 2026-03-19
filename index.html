@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danilo Hinic — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="#" class="nav-link">Resume</a>
+    </nav>
+    <a href="index.html" class="logo-dot"></a>
+    <div class="header-right">
+      <button class="btn-dark">Get in Touch</button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-name">Danilo Hinic</p>
+
+      <div class="hero-heading">
+        <div class="heading-top">
+          <span class="heading-text">A digital</span>
+          <div class="heading-icons">
+            <!-- Figma: black circle, sprite-cropped logo -->
+            <div class="icon-wrap icon-wrap--1">
+              <div class="icon-badge icon-badge--figma">
+                <div class="icon-inner-figma">
+                  <div class="icon-inner-figma-clip">
+                    <img src="https://www.figma.com/api/mcp/asset/8a3ac4f1-9124-4194-8d4a-de65bdb5413d" alt="Figma" />
+                  </div>
+                </div>
+              </div>
+              <span class="icon-label">Figma</span>
+            </div>
+            <!-- Claude: no bg, full image -->
+            <div class="icon-wrap icon-wrap--2">
+              <div class="icon-badge icon-badge--claude">
+                <img src="https://www.figma.com/api/mcp/asset/11f05196-8448-41e1-8ff4-094e8f513a45" alt="Claude" />
+              </div>
+              <span class="icon-label">Claude</span>
+            </div>
+            <!-- Webflow: blue circle -->
+            <div class="icon-wrap icon-wrap--3">
+              <div class="icon-badge icon-badge--webflow">
+                <div class="icon-inner-webflow">
+                  <img src="https://www.figma.com/api/mcp/asset/70642fa6-eb3a-42ee-8e4f-8a32606c12f9" alt="Webflow" />
+                </div>
+              </div>
+              <span class="icon-label">Webflow</span>
+            </div>
+          </div>
+          <span class="heading-text">designer</span>
+        </div>
+        <div class="heading-bottom">obsessing every detail.</div>
+      </div>
+
+      <p class="hero-sub">
+        Currently creating amazing stuff @&nbsp;<a
+          href="https://www.supercluster.studio"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="supercluster-link">Supercluster Studio.</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDER SECTION -->
+  <section class="slider-section">
+    <div class="project-card" id="projectCard">
+      <!-- Background image -->
+      <div class="card-content">
+        <div class="project-card-bg">
+          <img src="" alt="" class="project-bg-img" id="cardBgImg" />
+        </div>
+        <div class="card-gradient"></div>
+        <!-- Project info bottom-left -->
+        <div class="project-info">
+          <div class="project-title-row">
+            <div class="project-icon" id="cardIcon"></div>
+            <span class="project-title" id="cardTitle"></span>
+          </div>
+          <p class="project-desc" id="cardDesc"></p>
+        </div>
+      </div>
+      <!-- Custom cursor: green "View Project" pill, follows mouse -->
+      <div class="project-cursor" id="projectCursor">View Project</div>
+    </div>
+
+    <!-- Slider pill -->
+    <div class="slider-controls">
+      <div class="slider-pill">
+        <span class="slider-count" id="sliderCount">1 of 3</span>
+        <div class="slider-avatars">
+
+          <!-- Avatar 1: Hooker Furniture — Frame10 simple img -->
+          <div class="avatar-btn avatar-btn--frame active" data-index="0" role="button" tabindex="0">
+            <div class="avatar-circle avatar-circle--frame">
+              <img src="https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6" alt="Hooker" />
+            </div>
+            <span class="avatar-label">Hooker Furniture</span>
+          </div>
+
+          <!-- Avatar 2: Laurel Wealth Planning — green badge + sprite crop -->
+          <div class="avatar-btn avatar-btn--laurel" data-index="1" role="button" tabindex="0">
+            <div class="avatar-circle avatar-circle--laurel">
+              <div class="avatar-inner-laurel">
+                <div class="avatar-crop-laurel">
+                  <img src="https://www.figma.com/api/mcp/asset/6e5bbd7c-7f70-4e46-ab62-8fdab9bc2001" alt="Laurel" />
+                </div>
+              </div>
+            </div>
+            <span class="avatar-label">Laurel Wealth Planning</span>
+          </div>
+
+          <!-- Avatar 3: Supercluster Studio — dark badge + sprite -->
+          <div class="avatar-btn avatar-btn--sc" data-index="2" role="button" tabindex="0">
+            <div class="avatar-circle avatar-circle--sc">
+              <div class="avatar-inner-sc">
+                <div class="avatar-crop-sc">
+                  <img src="https://www.figma.com/api/mcp/asset/8ce9105c-1697-456e-a8ab-79893b0df028" alt="Supercluster" />
+                </div>
+              </div>
+            </div>
+            <span class="avatar-label">Supercluster Studio</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / METRICS SECTION -->
+  <section class="about-section">
+    <p class="about-text">
+      Over the past four years I've worked with <span class="about-white">agencies</span> and brands designing
+      <span class="about-green underline-link gif-trigger" data-gif="https://picsum.photos/seed/websites/440/300">websites</span>,
+      <span class="about-green underline-link gif-trigger" data-gif="https://picsum.photos/seed/ecommerce/440/300">e-commerce platforms</span>, and
+      <span class="about-green underline-link gif-trigger" data-gif="https://picsum.photos/seed/digitaltools/440/300">digital tools</span>
+      that balance usability, business goals, and visual clarity.
+    </p>
+
+    <div class="metrics">
+      <div class="metric-wrap metric-wrap--tilt-left">
+        <div class="metric metric--green">
+          <p class="metric-number">289</p>
+          <p class="metric-label">OMG I love this</p>
+        </div>
+      </div>
+      <div class="metric-wrap metric-wrap--tilt-right">
+        <div class="metric metric--dark">
+          <p class="metric-number">253</p>
+          <p class="metric-label">Good Jobs</p>
+        </div>
+      </div>
+      <div class="metric-wrap metric-wrap--tilt-left">
+        <div class="metric metric--green">
+          <p class="metric-number">2030</p>
+          <p class="metric-label">Mistakes made</p>
+        </div>
+      </div>
+      <div class="metric-wrap metric-wrap--tilt-right">
+        <div class="metric metric--dark">
+          <p class="metric-number">2030</p>
+          <p class="metric-label">Lessons learned</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GIF cursor follower (shared across all underlined triggers) -->
+  <div class="gif-follower" id="gifFollower">
+    <img id="gifImg" src="" alt="" />
+  </div>
+
+  <!-- Page transition overlay -->
+  <div id="page-transition">
+    <div class="transition-box"></div>
+  </div>
+
+  <script src="main.js"></script>
+  <script src="transition.js"></script>
+</body>
+</html>
