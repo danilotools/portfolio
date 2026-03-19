@@ -962,22 +962,18 @@ a.underline-link {
 .footer-icon-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--muted);
-  text-decoration: none;
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
-}
-.footer-icon-link:hover {
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--dark-card);
   color: var(--white);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  border: none;
+  flex-shrink: 0;
+  transition: background 0.2s;
 }
+.footer-icon-link:hover { background: #333330; }
 
 /* ─────────────────────────────────────────────
    Mobile hamburger menu
@@ -1131,7 +1127,7 @@ a.btn-dark {
   .hero         { padding-bottom: 48px; }
   .hero-inner   { gap: 20px; }
   .hero-name    { font-size: 16px; }
-  .hero-sub     { font-size: 16px; }
+  .hero-sub     { font-size: 16px; max-width: 260px; }
 
   /* Icon badges */
   .icon-badge     { width: 42px; height: 42px; border-radius: 22px; }

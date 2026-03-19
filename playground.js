@@ -58,27 +58,29 @@
     block.style.opacity   = '0';
     block.style.transform = `scale(0.72) rotate(${rot}deg)`;
 
-    const delay = 60 + i * 90;
+    /* Faster stagger on mobile (40ms) vs desktop (90ms) */
+    const delay = isMobile ? i * 40 : 60 + i * 90;
     setTimeout(() => {
-      block.style.transition = `opacity 0.65s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1),
-                                transform 0.65s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+      block.style.transition = `opacity 0.55s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1),
+                                transform 0.55s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1)`;
       block.style.opacity   = '1';
       block.style.transform = `rotate(${rot}deg)`;
 
       setTimeout(() => {
         block.style.transition = '';
-      }, 650 + delay + 50);
+      }, 560 + delay + 50);
     }, 16);
   });
 
   /* ── Drag state ── */
-  let active    = null;
-  let startMx   = 0, startMy   = 0;
-  let startLeft = 0, startTop  = 0;
-  let lastX     = 0, lastY     = 0;
-  let velX      = 0, velY      = 0;
-  let didDrag   = false;
-  let topZ      = 10;
+  let active     = null;
+  let startMx    = 0, startMy   = 0;
+  let startLeft  = 0, startTop  = 0;
+  let lastX      = 0, lastY     = 0;
+  let velX       = 0, velY      = 0;
+  let didDrag    = false;
+  let topZ       = 10;
+  let DRAG_SCALE = isMobile ? 1.35 : 1.8;
 
   const throwRAFs = new WeakMap();
 
@@ -109,7 +111,7 @@
     active.classList.add('is-dragging');
 
     active.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-    active.style.transform  = `scale(1.8) rotate(0deg)`;
+    active.style.transform  = `scale(${DRAG_SCALE}) rotate(0deg)`;
 
     playPickup();
 
@@ -149,7 +151,7 @@
     active.style.transition = '';
     active.style.left       = (startLeft + dx) + 'px';
     active.style.top        = (startTop  + dy) + 'px';
-    active.style.transform  = `scale(1.8) rotate(0deg)`;
+    active.style.transform  = `scale(${DRAG_SCALE}) rotate(0deg)`;
   }
 
   function onUp() {
@@ -180,8 +182,8 @@
     window.removeEventListener('touchmove', onMove);
     window.removeEventListener('touchend',  onUp);
 
-    /* ── 8. Throw physics ── */
-    if (hadDrag && (Math.abs(finalVX) > 2 || Math.abs(finalVY) > 2)) {
+    /* ── 8. Throw physics (desktop only — too costly on mobile) ── */
+    if (!isMobile && hadDrag && (Math.abs(finalVX) > 2 || Math.abs(finalVY) > 2)) {
       throwBlock(released, finalVX * 1.6, finalVY * 1.6);
     }
   }
