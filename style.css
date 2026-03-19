@@ -1396,15 +1396,17 @@ a.btn-dark {
   transition: width 0.25s linear;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .music-player {
-    min-width: calc(100vw - 32px);
-    left: 16px;
-    right: 16px;
-    transform: none;
-    bottom: 16px;
-    gap: 10px;
-    padding: 0 14px 0 12px;
+    min-width: unset;
+    width: auto;
+    padding: 0 12px;
+    gap: 4px;
+  }
+  .mp-info,
+  .mp-divider,
+  .mp-progress {
+    display: none;
   }
 }
 
