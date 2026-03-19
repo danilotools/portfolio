@@ -1161,9 +1161,9 @@ a.btn-dark {
   /* Footer */
   .footer         { flex-direction: column; align-items: flex-start; gap: 20px; }
 
-  /* Metrics — 100% width, fixed 320px height, number pinned bottom-left */
-  .metrics        { flex-direction: column; align-items: stretch; padding-right: 0; gap: 16px; }
-  .metric-wrap    { width: 100%; max-width: none; height: 320px; margin-right: 0; margin-bottom: 0; }
+  /* Metrics — 2×2 grid on mobile */
+  .metrics        { display: grid; grid-template-columns: 1fr 1fr; padding-right: 0; gap: 12px; }
+  .metric-wrap    { width: 100%; max-width: none; height: 200px; margin-right: 0; margin-bottom: 0; }
   .metric-wrap:last-child { margin-bottom: 0; }
   /* No tilt on mobile */
   .metric-wrap--tilt-left  .metric,
@@ -1177,9 +1177,9 @@ a.btn-dark {
   .metric-wrap--tilt-right:not(.in-view) .metric { opacity: 0; }
   .metric-wrap--tilt-left.in-view  .metric,
   .metric-wrap--tilt-right.in-view .metric  { opacity: 1; }
-  /* Full-width card, fixed height, number bottom-left at 16px */
-  .metric         { width: 100%; height: 320px; padding: 16px; border-radius: 24px; }
-  .metric-number  { font-size: 40px; }
+  /* Card fills its grid cell, number bottom-left at 16px */
+  .metric         { width: 100%; height: 200px; padding: 16px; border-radius: 20px; }
+  .metric-number  { font-size: 32px; }
 }
 
 /* ── Small mobile ≤ 480px ── */
@@ -1273,26 +1273,22 @@ a.btn-dark {
 /* ─────────────────────────────────────────────
    Music Player
 ───────────────────────────────────────────── */
-/* ── Bottom bar: shared container for player + scatter ── */
-.bottom-bar {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: bar-rise 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
+/* ── Shared rise animation ── */
 @keyframes bar-rise {
   from { opacity: 0; transform: translateX(-50%) translateY(16px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* Scatter button — lives inside .bottom-bar */
+/* ── Bottom bar: transparent on desktop (children are independently fixed) ── */
+.bottom-bar { display: contents; }
+
+/* ── Scatter button — desktop: fixed above player ── */
 .scatter-btn {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
   height: 48px;
   padding: 0 24px;
   background: var(--dark-card);
@@ -1307,17 +1303,24 @@ a.btn-dark {
   flex-shrink: 0;
   transition: background 0.18s, color 0.18s, transform 0.18s;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: bar-rise 0.7s 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .scatter-btn:hover {
   background: #333330;
   color: var(--white);
-  transform: scale(1.04);
+  transform: translateX(-50%) scale(1.04);
 }
 .scatter-btn:active {
-  transform: scale(0.97);
+  transform: translateX(-50%) scale(0.97);
 }
 
+/* ── Music player — desktop: fixed at bottom ── */
 .music-player {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -1328,6 +1331,7 @@ a.btn-dark {
   height: 48px;
   min-width: 380px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  animation: bar-rise 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mp-controls {
@@ -1431,11 +1435,35 @@ a.btn-dark {
 }
 
 @media (max-width: 768px) {
+  /* Bottom bar becomes a real flex row on mobile */
   .bottom-bar {
+    display: flex;
+    position: fixed;
     bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    align-items: center;
     gap: 8px;
+    animation: bar-rise 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  /* Children reset to static inside the flex row */
+  .scatter-btn {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    animation: none;
+  }
+  .scatter-btn:hover  { transform: scale(1.04); }
+  .scatter-btn:active { transform: scale(0.97); }
+
   .music-player {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    animation: none;
     min-width: unset;
     width: auto;
     padding: 0 12px;
