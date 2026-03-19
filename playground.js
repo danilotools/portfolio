@@ -30,7 +30,7 @@
   /* ── Randomise position & rotation + entrance animation ── */
   const headerH  = (document.querySelector('.header') || {}).offsetHeight || 80;
   const isMobile = window.innerWidth <= 768;
-  const SCALE    = isMobile ? 0.55 : 1; // 50% baseline + 10% larger
+  const SCALE    = isMobile ? 0.69 : 1; // 55% baseline + 25% larger
 
   blocks.forEach((block, i) => {
     /* Resize inline dimensions on mobile so JS positioning math is correct */
