@@ -76,20 +76,35 @@
       draggable: false;
     }
 
-    /* Open-link indicator on hover */
-    .pg-block::after {
-      content: '↗';
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      opacity: 0;
-      transition: opacity 0.2s;
+    /* ── Scatter button ── */
+    .scatter-btn {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      padding: 11px 24px;
+      background: var(--dark-card);
+      color: rgba(255,255,255,0.65);
+      font-family: 'Roboto', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.18s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
-    .pg-block:hover::after {
-      opacity: 1;
+    .scatter-btn:hover {
+      background: #333330;
+      color: var(--white);
+      transform: translateX(-50%) scale(1.04);
     }
+    .scatter-btn:active {
+      transform: translateX(-50%) scale(0.97);
+    }
+
   </style>
 </head>
 <body id="playground">
@@ -110,41 +125,81 @@
   <!-- PLAYGROUND CANVAS -->
   <main class="playground-field" id="playgroundField">
 
-    <!-- Block 1 — replace src + href when ready -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="300" data-h="380" style="width:300px;height:380px">
-      <img src="https://picsum.photos/seed/pg1/300/380" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:400px;height:256px">
+      <img src="images/playground/01-tap-hero.png" alt="Continuum AI — Hero Section" draggable="false" />
+    </div>
 
-    <!-- Block 2 -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="340" data-h="240" style="width:340px;height:240px">
-      <img src="https://picsum.photos/seed/pg2/340/240" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:380px;height:244px">
+      <img src="images/playground/02-tap-bento.png" alt="Continuum AI — Bento Features" draggable="false" />
+    </div>
 
-    <!-- Block 3 -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="260" data-h="320" style="width:260px;height:320px">
-      <img src="https://picsum.photos/seed/pg3/260/320" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:360px;height:232px">
+      <img src="images/playground/03-humnet.png" alt="What You Care About Section" draggable="false" />
+    </div>
 
-    <!-- Block 4 -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="400" data-h="280" style="width:400px;height:280px">
-      <img src="https://picsum.photos/seed/pg4/400/280" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:360px;height:232px">
+      <img src="images/playground/04-LWP-6.png" alt="CTA Section" draggable="false" />
+    </div>
 
-    <!-- Block 5 -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="280" data-h="280" style="width:280px;height:280px">
-      <img src="https://picsum.photos/seed/pg5/280/280" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:360px;height:232px">
+      <img src="images/playground/05-upliasection.png" alt="Benefits Section" draggable="false" />
+    </div>
 
-    <!-- Block 6 -->
-    <a class="pg-block" href="#" target="_blank" rel="noopener"
-       data-w="320" data-h="420" style="width:320px;height:420px">
-      <img src="https://picsum.photos/seed/pg6/320/420" alt="" draggable="false" />
-    </a>
+    <div class="pg-block" style="width:340px;height:220px">
+      <img src="images/playground/06-ASF-section.png" alt="Software Section" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:360px;height:232px">
+      <img src="images/playground/07-acadium2.png" alt="Pricing Component" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:380px;height:244px">
+      <img src="images/playground/08-ULPIA.png" alt="Landing Page Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:400px;height:256px">
+      <img src="images/playground/09-Menu-2.png" alt="Mega Menu Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:300px;height:200px">
+      <img src="images/playground/10-contact.png" alt="Contact Us Page" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:260px;height:340px">
+      <img src="images/playground/11-poster-logo.png" alt="Poster & Logo Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:240px;height:240px">
+      <img src="images/playground/12-logo.jpg" alt="Logo Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:360px;height:232px">
+      <img src="images/playground/13-workello.png" alt="Website Elements Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:260px;height:340px">
+      <img src="images/playground/14-letterhead.png" alt="Letterhead Mockup" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:360px;height:220px">
+      <img src="images/playground/15-business-card.png" alt="Business Card Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:380px;height:244px">
+      <img src="images/playground/16-acadium.png" alt="Acadium — Landing Page" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:260px;height:340px">
+      <img src="images/playground/17-app-icon.png" alt="App Icon & Wallpaper" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:260px;height:340px">
+      <img src="images/playground/18-posters.jpg" alt="Posters Design" draggable="false" />
+    </div>
+
+    <div class="pg-block" style="width:360px;height:240px">
+      <img src="images/playground/19-neon-sign.jpg" alt="Outdoor Neon Sign Design" draggable="false" />
+    </div>
 
   </main>
 
@@ -173,6 +228,9 @@
       <span class="mp-time" id="mpDuration">0:00</span>
     </div>
   </div>
+
+  <!-- Scatter button -->
+  <button class="scatter-btn" id="scatterBtn">Scatter</button>
 
   <!-- Page transition overlay -->
   <div id="page-transition">
