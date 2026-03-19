@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume — Danilo Hinić</title>
+  <meta name="description" content="Resume of Danilo Hinić, UX/UI Designer from Belgrade, Serbia." />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .resume {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 120px 40px 140px;
+    }
+
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Sections ── */
+    .resume-section {
+      padding: 72px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .resume-section:first-child { border-top: none; padding-top: 0; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 52px;
+    }
+
+    /* ── Experience entries ── */
+    .entry-list { display: flex; flex-direction: column; gap: 72px; }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0 48px;
+    }
+
+    .entry-meta { padding-top: 5px; }
+
+    .entry-period {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.35);
+      line-height: 1.7;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge-current {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 3px 10px;
+      background: var(--green);
+      color: var(--black);
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .entry-role {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .entry-company {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 20px;
+    }
+    .entry-company a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .entry-company a:hover {
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .entry-summary {
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .entry-bullets {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .entry-bullets li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.38);
+    }
+    .entry-bullets li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      opacity: 0.7;
+    }
+
+    /* ── Skills ── */
+    .skills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .skill-tag {
+      padding: 9px 18px;
+      background: var(--dark-card);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.65);
+      letter-spacing: 0.02em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .skill-tag:hover { background: #333330; color: var(--white); }
+
+    /* ── Education ── */
+    .edu-list { display: flex; flex-direction: column; }
+    .edu-entry {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0 48px;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .edu-entry:first-child { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .edu-period {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.35);
+      padding-top: 4px;
+    }
+    .edu-degree {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 5px;
+    }
+    .edu-school {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ── Award ── */
+    .award-entry {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0 48px;
+    }
+    .award-date {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.35);
+      padding-top: 4px;
+    }
+    .award-name {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .award-org { font-size: 15px; color: rgba(255, 255, 255, 0.4); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .resume { padding: 100px 20px 80px; }
+
+      .entry,
+      .edu-entry,
+      .award-entry {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .entry-meta { display: flex; align-items: center; gap: 14px; }
+      .badge-current { margin-top: 0; }
+      .entry-list { gap: 52px; }
+      .resume-section { padding: 52px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="playground.html" class="nav-link">Playground</a>
+      <a href="resume.html" class="nav-link active">Resume</a>
+    </nav>
+    <a href="index.html" class="logo-dot"></a>
+    <div class="header-right">
+      <button class="btn-dark">Get in Touch</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="resume">
+
+      <!-- ── EXPERIENCE ── -->
+      <section class="resume-section reveal">
+        <p class="section-label">Experience</p>
+        <div class="entry-list">
+
+          <div class="entry">
+            <div class="entry-meta">
+              <p class="entry-period">Mar 2024<br>Present</p>
+              <span class="badge-current">Current</span>
+            </div>
+            <div>
+              <h2 class="entry-role">UX/UI Designer</h2>
+              <p class="entry-company">
+                <a href="https://www.supercluster.studio" target="_blank" rel="noopener noreferrer">SuperCluster Studio</a>
+                &nbsp;— Belgrade
+              </p>
+              <p class="entry-summary">Working as part of a design studio, mostly focused on designing for furniture e-commerce brands.</p>
+              <ul class="entry-bullets">
+                <li>Designing e-commerce platforms for furniture brands, enhancing user experience and driving online traffic and sales.</li>
+                <li>Designing interactive configurators for furniture, allowing customers to customise products in real-time.</li>
+                <li>Working on design projects for high-profile clients, delivering top-notch digital experiences.</li>
+                <li>Creating wireframes, prototypes, and high-fidelity mockups to communicate design ideas effectively.</li>
+                <li>Managing multiple projects simultaneously, meeting tight deadlines and exceeding client expectations.</li>
+                <li>Staying updated on the latest design trends and tools, continuously improving skills and knowledge.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="entry">
+            <div class="entry-meta">
+              <p class="entry-period">Oct 2022<br>Mar 2024</p>
+            </div>
+            <div>
+              <h2 class="entry-role">UX/UI Designer</h2>
+              <p class="entry-company">Bureau 22 &nbsp;— Belgrade</p>
+              <p class="entry-summary">Working as part of the UX/UI team to develop innovative design concepts and enhance user experience flows for global clients.</p>
+              <ul class="entry-bullets">
+                <li>Refreshed outdated team designs, enhancing their visual appeal and functionality.</li>
+                <li>Led the development of websites and applications at the Bureau, transforming concepts into fully realised products.</li>
+                <li>Leveraged Figma extensively to create visually engaging and user-centric designs.</li>
+                <li>Utilised WordPress and occasional coding to bring variety and flexibility to projects.</li>
+                <li>Continuously researched emerging design trends and incorporated innovative ideas into my work.</li>
+                <li>Maintained a proactive approach, consistently pushing creative boundaries and delivering results.</li>
+                <li>Thrived in dynamic, fast-paced environments, adapting to diverse client requirements and perspectives.</li>
+                <li>Strengthened collaboration skills by giving and receiving constructive feedback effectively.</li>
+                <li>Conducted thorough quality assurance to ensure design alignment with development outcomes.</li>
+                <li>Managed client communications, kept projects on schedule, and contributed to team efforts in design and development to ensure seamless workflows.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="entry">
+            <div class="entry-meta">
+              <p class="entry-period">Mar 2022<br>Sep 2022</p>
+            </div>
+            <div>
+              <h2 class="entry-role">UX/UI Designer <span style="font-weight:400;color:rgba(255,255,255,0.3);font-size:18px;">— Freelance</span></h2>
+              <p class="entry-company">Art Storefronts &nbsp;— Austin, TX</p>
+              <p class="entry-summary">Working with the design team to upgrade the platform's overall look and feel.</p>
+              <ul class="entry-bullets">
+                <li>Revitalised outdated team designs, modernising their look and functionality.</li>
+                <li>Designed fresh themes and updated classic styles to maintain a sharp and cohesive aesthetic.</li>
+                <li>Collaborated closely with front-end developers to fine-tune and optimise designs.</li>
+                <li>Enhanced the platform's landing page to create a strong and memorable first impression.</li>
+                <li>Conducted design audits for client websites, identifying areas for improvement and providing actionable recommendations.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── SKILLS ── -->
+      <section class="resume-section reveal">
+        <p class="section-label">Skills &amp; Tools</p>
+        <div class="skills-wrap">
+          <span class="skill-tag">UX / UI Design</span>
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">Webflow</span>
+          <span class="skill-tag">Wireframing</span>
+          <span class="skill-tag">Prototyping</span>
+          <span class="skill-tag">Branding</span>
+          <span class="skill-tag">Graphic Design</span>
+          <span class="skill-tag">HTML</span>
+          <span class="skill-tag">CSS</span>
+          <span class="skill-tag">WordPress</span>
+          <span class="skill-tag">Elementor</span>
+          <span class="skill-tag">Adobe Illustrator</span>
+          <span class="skill-tag">Adobe InDesign</span>
+          <span class="skill-tag">Adobe Photoshop</span>
+          <span class="skill-tag">ChatGPT</span>
+          <span class="skill-tag">Print</span>
+        </div>
+      </section>
+
+      <!-- ── EDUCATION ── -->
+      <section class="resume-section reveal">
+        <p class="section-label">Education</p>
+        <div class="edu-list">
+          <div class="edu-entry">
+            <p class="edu-period">2014 – 2022</p>
+            <div>
+              <h2 class="edu-degree">Bachelor's Degree in Information Technology</h2>
+              <p class="edu-school">ITS — Information Technology School, Belgrade</p>
+            </div>
+          </div>
+          <div class="edu-entry">
+            <p class="edu-period">2010 – 2014</p>
+            <div>
+              <h2 class="edu-degree">High School Diploma in Languages &amp; Art</h2>
+              <p class="edu-school">Gymnasium Vuk Karadžić, Trstenik</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── AWARDS ── -->
+      <section class="resume-section reveal">
+        <p class="section-label">Awards</p>
+        <div class="award-entry">
+          <p class="award-date">July 2018</p>
+          <div>
+            <h2 class="award-name">1st Place — Design of Advertising Material</h2>
+            <p class="award-org">Agriculture Fair &nbsp;·&nbsp; Delta Agrar, Novi Sad</p>
+          </div>
+        </div>
+      </section>
+
+    </article>
+  </main>
+
+  <div id="page-transition">
+    <div class="transition-box"></div>
+  </div>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+  <script src="transition.js"></script>
+
+</body>
+</html>

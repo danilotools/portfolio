@@ -143,6 +143,10 @@ const onceVisible = (el, callback) => {
 // About text — fade up
 onceVisible(aboutText, (el) => el.classList.add('in-view'));
 
+// CTA section — fade up
+const ctaSection = document.querySelector('.cta-section');
+if (ctaSection) onceVisible(ctaSection, (el) => el.classList.add('in-view'));
+
 // Metric cards — staggered entrance
 metricWraps.forEach((wrap, i) => {
   onceVisible(wrap, (el) => {

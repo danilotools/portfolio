@@ -3,19 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Danilo Hinic — Portfolio</title>
+  <title>Danilo Hinic — Digital Designer</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Danilo Hinic is a digital designer obsessing every detail — building websites, e-commerce platforms, and digital tools at Supercluster Studio." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#161518" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Danilo Hinic — Digital Designer" />
+  <meta property="og:description" content="Digital designer obsessing every detail. Websites, e-commerce, and digital tools." />
+  <meta property="og:site_name"   content="Danilo Hinic" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Danilo Hinic — Digital Designer" />
+  <meta name="twitter:description" content="Digital designer obsessing every detail. Websites, e-commerce, and digital tools." />
+
+  <!-- Roboto for body text (General Sans is self-hosted via @font-face in style.css) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Danilo Hinic",
+    "jobTitle": "Digital Designer",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Supercluster Studio",
+      "url": "https://www.supercluster.studio"
+    },
+    "knowsAbout": ["Web Design", "UX Design", "Figma", "Webflow", "E-commerce Design", "Digital Product Design"]
+  }
+  </script>
 </head>
 <body>
   <!-- HEADER -->
   <header class="header">
-    <nav class="nav">
+    <nav class="nav" aria-label="Primary navigation">
       <a href="index.html" class="nav-link active">Home</a>
-      <a href="about.html" class="nav-link">About</a>
-      <a href="#" class="nav-link">Resume</a>
+      <a href="playground.html" class="nav-link">Playground</a>
+      <a href="resume.html" class="nav-link">Resume</a>
     </nav>
     <a href="index.html" class="logo-dot"></a>
     <div class="header-right">
@@ -23,13 +58,15 @@
     </div>
   </header>
 
+  <main id="main-content">
+
   <!-- HERO SECTION -->
-  <section class="hero">
+  <section class="hero" aria-label="Hero">
     <div class="hero-inner">
       <p class="hero-name">Danilo Hinic</p>
 
-      <div class="hero-heading">
-        <div class="heading-top">
+      <h1 class="hero-heading">
+        <span class="heading-top">
           <span class="heading-text">A digital</span>
           <div class="heading-icons">
             <!-- Figma: black circle, sprite-cropped logo -->
@@ -61,9 +98,9 @@
             </div>
           </div>
           <span class="heading-text">designer</span>
-        </div>
-        <div class="heading-bottom">obsessing every detail.</div>
-      </div>
+        </span>
+        <span class="heading-bottom">obsessing every detail.</span>
+      </h1>
 
       <p class="hero-sub">
         Currently creating amazing stuff @&nbsp;<a
@@ -75,8 +112,9 @@
     </div>
   </section>
 
-  <!-- SLIDER SECTION -->
-  <section class="slider-section">
+  <!-- PROJECTS SECTION -->
+  <section class="slider-section" aria-label="Selected projects">
+    <h2 class="sr-only">Selected Projects</h2>
     <div class="project-card" id="projectCard">
       <!-- Background image -->
       <div class="card-content">
@@ -141,7 +179,8 @@
   </section>
 
   <!-- ABOUT / METRICS SECTION -->
-  <section class="about-section">
+  <section class="about-section" aria-label="About and metrics">
+    <h2 class="sr-only">About</h2>
     <p class="about-text">
       Over the past four years I've worked with <span class="about-white">agencies</span> and brands designing
       <span class="about-green underline-link gif-trigger" data-gif="https://picsum.photos/seed/websites/440/300">websites</span>,
@@ -177,6 +216,8 @@
       </div>
     </div>
   </section>
+
+  </main><!-- /#main-content -->
 
   <!-- GIF cursor follower (shared across all underlined triggers) -->
   <div class="gif-follower" id="gifFollower">
