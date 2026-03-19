@@ -1272,12 +1272,51 @@ a.btn-dark {
 /* ─────────────────────────────────────────────
    Music Player
 ───────────────────────────────────────────── */
-.music-player {
+/* ── Bottom bar: shared container for player + scatter ── */
+.bottom-bar {
   position: fixed;
   bottom: 28px;
   left: 50%;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%);
   z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: bar-rise 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes bar-rise {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Scatter button — lives inside .bottom-bar */
+.scatter-btn {
+  height: 48px;
+  padding: 0 24px;
+  background: var(--dark-card);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.18s, color 0.18s, transform 0.18s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.scatter-btn:hover {
+  background: #333330;
+  color: var(--white);
+  transform: scale(1.04);
+}
+.scatter-btn:active {
+  transform: scale(0.97);
+}
+
+.music-player {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -1285,15 +1324,9 @@ a.btn-dark {
   border: none;
   border-radius: 100px;
   padding: 0 20px 0 16px;
-  height: 56px;
+  height: 48px;
   min-width: 380px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-  animation: mp-rise 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes mp-rise {
-  from { transform: translateX(-50%) translateY(16px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
 
 .mp-controls {
@@ -1397,6 +1430,10 @@ a.btn-dark {
 }
 
 @media (max-width: 768px) {
+  .bottom-bar {
+    bottom: 16px;
+    gap: 8px;
+  }
   .music-player {
     min-width: unset;
     width: auto;

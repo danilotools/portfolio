@@ -28,9 +28,19 @@
   function playDrop()   { playTone(320, 200, 0.08, 0.16); }
 
   /* ── Randomise position & rotation + entrance animation ── */
-  const headerH = (document.querySelector('.header') || {}).offsetHeight || 80;
+  const headerH  = (document.querySelector('.header') || {}).offsetHeight || 80;
+  const isMobile = window.innerWidth <= 768;
+  const SCALE    = isMobile ? 0.55 : 1; // 50% baseline + 10% larger
 
   blocks.forEach((block, i) => {
+    /* Resize inline dimensions on mobile so JS positioning math is correct */
+    if (isMobile) {
+      const origW = parseInt(block.style.width,  10) || block.offsetWidth;
+      const origH = parseInt(block.style.height, 10) || block.offsetHeight;
+      block.style.width  = Math.round(origW * SCALE) + 'px';
+      block.style.height = Math.round(origH * SCALE) + 'px';
+    }
+
     const bw  = block.offsetWidth;
     const bh  = block.offsetHeight;
     const vw  = window.innerWidth;

@@ -76,42 +76,6 @@
       draggable: false;
     }
 
-    /* ── Scatter button ── */
-    .scatter-btn {
-      position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      padding: 11px 24px;
-      background: var(--dark-card);
-      color: rgba(255,255,255,0.65);
-      font-family: 'Roboto', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      border: none;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: background 0.18s, color 0.18s, transform 0.18s;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .scatter-btn:hover {
-      background: #333330;
-      color: var(--white);
-      transform: translateX(-50%) scale(1.04);
-    }
-    .scatter-btn:active {
-      transform: translateX(-50%) scale(0.97);
-    }
-
-    /* ── Mobile: shrink blocks to 50% ── */
-    @media (max-width: 768px) {
-      .pg-block {
-        zoom: 0.5;
-      }
-    }
-
   </style>
 </head>
 <body id="playground">
@@ -224,34 +188,38 @@
 
   </main>
 
-  <!-- Music Player: [Info] | [Controls] | [Progress] -->
-  <div class="music-player" id="musicPlayer">
-    <div class="mp-info">
-      <span class="mp-title" id="mpTitle">Loading…</span>
-      <span class="mp-artist" id="mpArtist">—</span>
-    </div>
-    <div class="mp-divider"></div>
-    <div class="mp-controls">
-      <button class="mp-btn" id="mpPrev" aria-label="Previous">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="2.5" height="12" rx="1"/><path d="M13.5 3.5L6 8l7.5 4.5V3.5z"/></svg>
-      </button>
-      <button class="mp-btn mp-btn--play" id="mpPlay" aria-label="Play">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg>
-      </button>
-      <button class="mp-btn" id="mpNext" aria-label="Next">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="11.5" y="2" width="2.5" height="12" rx="1"/><path d="M2.5 3.5L10 8 2.5 12.5V3.5z"/></svg>
-      </button>
-    </div>
-    <div class="mp-divider"></div>
-    <div class="mp-progress">
-      <span class="mp-time" id="mpCurrent">0:00</span>
-      <div class="mp-bar" id="mpBar"><div class="mp-fill" id="mpFill"></div></div>
-      <span class="mp-time" id="mpDuration">0:00</span>
-    </div>
-  </div>
+  <!-- Bottom bar: Scatter + Player -->
+  <div class="bottom-bar">
 
-  <!-- Scatter button -->
-  <button class="scatter-btn" id="scatterBtn">Scatter</button>
+    <button class="scatter-btn" id="scatterBtn">Scatter</button>
+
+    <!-- Music Player: [Info] | [Controls] | [Progress] -->
+    <div class="music-player" id="musicPlayer">
+      <div class="mp-info">
+        <span class="mp-title" id="mpTitle">Loading…</span>
+        <span class="mp-artist" id="mpArtist">—</span>
+      </div>
+      <div class="mp-divider"></div>
+      <div class="mp-controls">
+        <button class="mp-btn" id="mpPrev" aria-label="Previous">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="2.5" height="12" rx="1"/><path d="M13.5 3.5L6 8l7.5 4.5V3.5z"/></svg>
+        </button>
+        <button class="mp-btn mp-btn--play" id="mpPlay" aria-label="Play">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg>
+        </button>
+        <button class="mp-btn" id="mpNext" aria-label="Next">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="11.5" y="2" width="2.5" height="12" rx="1"/><path d="M2.5 3.5L10 8 2.5 12.5V3.5z"/></svg>
+        </button>
+      </div>
+      <div class="mp-divider"></div>
+      <div class="mp-progress">
+        <span class="mp-time" id="mpCurrent">0:00</span>
+        <div class="mp-bar" id="mpBar"><div class="mp-fill" id="mpFill"></div></div>
+        <span class="mp-time" id="mpDuration">0:00</span>
+      </div>
+    </div>
+
+  </div>
 
   <!-- Page transition overlay -->
   <div id="page-transition">
