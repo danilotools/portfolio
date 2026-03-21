@@ -759,8 +759,6 @@ a.underline-link {
 
 .about-green {
   color: var(--green);
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 /* ── METRICS ── */
