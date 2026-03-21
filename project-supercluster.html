@@ -14,7 +14,7 @@
 
   <style>
     .sp-page {
-      padding-top: 120px;
+      padding-top: 80px;
       padding-bottom: 120px;
       padding-left:  clamp(20px, 5vw, 80px);
       padding-right: clamp(20px, 5vw, 80px);
@@ -212,21 +212,32 @@
 
     /* ── Case study ── */
     .sp-case-study {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
       margin-bottom: 48px;
       padding-bottom: 40px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .sp-case-block {
-      padding: 20px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0 28px 0 0;
     }
 
-    .sp-case-block:first-child {
-      padding-top: 0;
-      border-top: none;
+    .sp-case-block + .sp-case-block {
+      padding: 0 28px 0 28px;
+      border-left: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .sp-case-block:last-child {
+      padding-right: 0;
+    }
+
+    .sp-case-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .sp-case-num {
@@ -236,22 +247,19 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--green);
-      display: block;
-      margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
     .sp-case-label {
       font-family: 'Roboto', sans-serif;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.88);
-      display: block;
-      margin-bottom: 8px;
     }
 
     .sp-case-text {
       font-family: 'Roboto', sans-serif;
-      font-size: 13px;
+      font-size: 15px;
       line-height: 1.65;
       color: var(--muted);
       margin: 0;
@@ -356,18 +364,24 @@
         <!-- Case Study -->
         <div class="sp-case-study sp-reveal">
           <div class="sp-case-block">
-            <span class="sp-case-num">01</span>
-            <span class="sp-case-label">Problem</span>
+            <div class="sp-case-head">
+              <span class="sp-case-num">01</span>
+              <span class="sp-case-label">Problem</span>
+            </div>
             <p class="sp-case-text">Supercluster needed a dedicated page for their Webflow development offer — something that could convert cold traffic without the noise of a full website behind it.</p>
           </div>
           <div class="sp-case-block">
-            <span class="sp-case-num">02</span>
-            <span class="sp-case-label">Process</span>
+            <div class="sp-case-head">
+              <span class="sp-case-num">02</span>
+              <span class="sp-case-label">Process</span>
+            </div>
             <p class="sp-case-text">Kept the structure tight. Clear headline, social proof, service breakdown, single CTA. Copy and design worked together from day one — every section had exactly one job.</p>
           </div>
           <div class="sp-case-block">
-            <span class="sp-case-num">03</span>
-            <span class="sp-case-label">Outcome</span>
+            <div class="sp-case-head">
+              <span class="sp-case-num">03</span>
+              <span class="sp-case-label">Outcome</span>
+            </div>
             <p class="sp-case-text">A focused, fast-loading landing page that communicates value quickly and gives visitors exactly what they need to make a decision.</p>
           </div>
         </div>
