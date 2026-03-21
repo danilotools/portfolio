@@ -7,29 +7,29 @@
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     return audioCtx;
   }
-  function playTone(freq1, freq2, dur, vol) {
+  function playTone(f1, f2, dur, vol) {
     try {
-      const ctx  = getCtx();
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
+      const ctx = getCtx(), osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq1, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(freq2, ctx.currentTime + dur);
-      gain.gain.setValueAtTime(vol, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + dur + 0.01);
+      osc.frequency.setValueAtTime(f1, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(f2, ctx.currentTime + dur);
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + dur + 0.01);
     } catch (_) {}
   }
   function playPickup() { playTone(180, 90,  0.12, 0.22); }
   function playDrop()   { playTone(320, 200, 0.08, 0.16); }
+  function playClack()  { playTone(680, 320, 0.08, 0.28); }
+  function playPocket() { playTone(110, 55,  0.28, 0.30); }
 
-  /* ── Initial layout ── */
+  /* ── Layout constants ── */
   const headerH  = (document.querySelector('.header') || {}).offsetHeight || 80;
   const isMobile = window.innerWidth <= 768;
   const SCALE    = isMobile ? 0.69 : 1;
 
+  /* ── Initial scatter ── */
   blocks.forEach((block, i) => {
     if (isMobile) {
       const origW = parseInt(block.style.width,  10) || block.offsetWidth;
@@ -41,38 +41,35 @@
     block._origHeight = block.style.height;
 
     const bw = block.offsetWidth, bh = block.offsetHeight;
-    const vw = window.innerWidth,  vh = window.innerHeight;
-    const margin = 24;
-    const x   = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
-    const y   = headerH + margin + Math.random() * Math.max(0, vh - headerH - bh - margin * 2);
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const m  = 24;
+    const x   = m + Math.random() * Math.max(0, vw - bw - m * 2);
+    const y   = headerH + m + Math.random() * Math.max(0, vh - headerH - bh - m * 2);
     const rot = (Math.random() - 0.5) * 24;
-    block.style.left      = x + 'px';
-    block.style.top       = y + 'px';
-    block._rot            = rot;
-    block.style.opacity   = '0';
+    block.style.left = x + 'px'; block.style.top = y + 'px';
+    block._rot = rot; block.style.opacity = '0';
     block.style.transform = `scale(0.72) rotate(${rot}deg)`;
 
-    const delay = isMobile ? i * 40 : 60 + i * 90;
+    const d = isMobile ? i * 40 : 60 + i * 90;
     setTimeout(() => {
-      block.style.transition = `opacity 0.55s ${delay}ms cubic-bezier(0.16,1,0.3,1),
-                                transform 0.55s ${delay}ms cubic-bezier(0.16,1,0.3,1)`;
+      block.style.transition = `opacity .55s ${d}ms cubic-bezier(.16,1,.3,1),
+                                transform .55s ${d}ms cubic-bezier(.16,1,.3,1)`;
       block.style.opacity   = '1';
       block.style.transform = `rotate(${rot}deg)`;
-      setTimeout(() => { block.style.transition = ''; }, 560 + delay + 50);
+      setTimeout(() => { block.style.transition = ''; }, 560 + d + 50);
     }, 16);
   });
 
-  /* ── Drag state ── */
+  /* ── Drag (normal mode) ── */
   let active = null, startMx = 0, startMy = 0, startLeft = 0, startTop = 0;
-  let lastX  = 0, lastY = 0, velX = 0, velY = 0, didDrag = false;
-  let topZ   = 10;
-  let chaosActive = false;
+  let lastX = 0, lastY = 0, velX = 0, velY = 0, didDrag = false, topZ = 10;
+  let poolActive = false;
   const DRAG_SCALE = isMobile ? 1.35 : 1.8;
   const throwRAFs  = new WeakMap();
 
-  blocks.forEach(block => {
-    block.addEventListener('mousedown', onDown);
-    block.addEventListener('touchstart', onDown, { passive: false });
+  blocks.forEach(b => {
+    b.addEventListener('mousedown', onDown);
+    b.addEventListener('touchstart', onDown, { passive: false });
   });
 
   function getXY(e) {
@@ -82,25 +79,20 @@
   }
 
   function onDown(e) {
-    if (chaosActive) return;
+    if (poolActive) return;
     if (e.button && e.button !== 0) return;
     e.preventDefault();
-
     const raf = throwRAFs.get(e.currentTarget);
     if (raf) cancelAnimationFrame(raf);
-
     active = e.currentTarget; didDrag = false; velX = 0; velY = 0;
-    active.style.zIndex = 9999;
-    active.classList.add('is-dragging');
-    active.style.transition = 'transform 0.3s cubic-bezier(0.16,1,0.3,1)';
+    active.style.zIndex = 9999; active.classList.add('is-dragging');
+    active.style.transition = 'transform .3s cubic-bezier(.16,1,.3,1)';
     active.style.transform  = `scale(${DRAG_SCALE}) rotate(0deg)`;
     playPickup();
-
     const { x, y } = getXY(e);
     startMx = x; startMy = y; lastX = x; lastY = y;
     startLeft = parseFloat(active.style.left) || 0;
     startTop  = parseFloat(active.style.top)  || 0;
-
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup',   onUp);
     window.addEventListener('touchmove', onMove, { passive: false });
@@ -108,8 +100,7 @@
   }
 
   function onMove(e) {
-    if (!active) return;
-    e.preventDefault();
+    if (!active) return; e.preventDefault();
     const { x, y } = getXY(e);
     const dx = x - startMx, dy = y - startMy;
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag = true;
@@ -118,252 +109,375 @@
     velY = velY * 0.72 + (y - lastY) * 0.28;
     lastX = x; lastY = y;
     active.style.transition = '';
-    active.style.left       = (startLeft + dx) + 'px';
-    active.style.top        = (startTop  + dy) + 'px';
-    active.style.transform  = `scale(${DRAG_SCALE}) rotate(0deg)`;
+    active.style.left = (startLeft + dx) + 'px';
+    active.style.top  = (startTop  + dy) + 'px';
+    active.style.transform = `scale(${DRAG_SCALE}) rotate(0deg)`;
   }
 
   function onUp() {
     if (!active) return;
     active.classList.remove('is-dragging');
-    const released = active, finalVX = velX, finalVY = velY, hadDrag = didDrag;
-    released.style.transition = 'transform 0.5s cubic-bezier(0.25,1,0.5,1)';
-    released.style.transform  = `rotate(${released._rot}deg)`;
-    released.style.zIndex     = ++topZ;
-    setTimeout(() => { released.style.transition = ''; }, 550);
+    const rel = active, fvx = velX, fvy = velY, hadDrag = didDrag;
+    rel.style.transition = 'transform .5s cubic-bezier(.25,1,.5,1)';
+    rel.style.transform  = `rotate(${rel._rot}deg)`;
+    rel.style.zIndex     = ++topZ;
+    setTimeout(() => { rel.style.transition = ''; }, 550);
     playDrop();
     active = null; didDrag = false; velX = 0; velY = 0;
     window.removeEventListener('mousemove', onMove);
     window.removeEventListener('mouseup',   onUp);
     window.removeEventListener('touchmove', onMove);
     window.removeEventListener('touchend',  onUp);
-    if (!isMobile && hadDrag && (Math.abs(finalVX) > 2 || Math.abs(finalVY) > 2)) {
-      throwBlock(released, finalVX * 1.6, finalVY * 1.6);
+    if (!isMobile && hadDrag && (Math.abs(fvx) > 2 || Math.abs(fvy) > 2)) {
+      simpleThrow(rel, fvx * 1.6, fvy * 1.6);
     }
   }
 
-  /* ── Throw physics (shared: normal drag + pool hit) ── */
-  function throwBlock(block, vx, vy) {
-    const FRICTION    = 0.88;
-    const MIN_V       = 0.4;
-    const POCKET_SIZE = 68;
-
+  /* Simple throw for normal drag mode (no ball-ball physics) */
+  function simpleThrow(block, vx, vy) {
+    const F = 0.88, MV = 0.4;
     function step() {
-      vx *= FRICTION; vy *= FRICTION;
+      vx *= F; vy *= F;
       let nx = parseFloat(block.style.left) + vx;
       let ny = parseFloat(block.style.top)  + vy;
-
-      /* Pocket check — chaos mode only */
-      if (chaosActive && block.style.display !== 'none') {
-        const bw = block.offsetWidth, bh = block.offsetHeight;
-        const bx = nx + bw / 2, by = ny + bh / 2;
-        const vw = window.innerWidth,  vh = window.innerHeight;
-        for (const [px, py] of getPockets(vw, vh)) {
-          const ddx = bx - px, ddy = by - py;
-          if (Math.sqrt(ddx*ddx + ddy*ddy) < POCKET_SIZE) {
-            pocketBlock(block, px, py); return;
-          }
-        }
-      }
-
-      const margin = 8;
-      const maxX = window.innerWidth  - block.offsetWidth  - margin;
-      const maxY = window.innerHeight - block.offsetHeight - margin;
-      if (nx < margin)           { nx = margin;  vx *= -0.3; }
-      if (ny < headerH + margin) { ny = headerH + margin; vy *= -0.3; }
-      if (nx > maxX)             { nx = maxX;    vx *= -0.3; }
-      if (ny > maxY)             { ny = maxY;    vy *= -0.3; }
-
-      block.style.left = nx + 'px';
-      block.style.top  = ny + 'px';
-
-      if (Math.abs(vx) > MIN_V || Math.abs(vy) > MIN_V) {
-        throwRAFs.set(block, requestAnimationFrame(step));
-      } else {
-        throwRAFs.delete(block);
-      }
+      const mg = 8, mxX = window.innerWidth - block.offsetWidth - mg, mxY = window.innerHeight - block.offsetHeight - mg;
+      if (nx < mg)        { nx = mg;  vx *= -0.3; }
+      if (ny < headerH+mg){ ny = headerH+mg; vy *= -0.3; }
+      if (nx > mxX)       { nx = mxX; vx *= -0.3; }
+      if (ny > mxY)       { ny = mxY; vy *= -0.3; }
+      block.style.left = nx + 'px'; block.style.top = ny + 'px';
+      if (Math.abs(vx) > MV || Math.abs(vy) > MV) throwRAFs.set(block, requestAnimationFrame(step));
+      else throwRAFs.delete(block);
     }
     throwRAFs.set(block, requestAnimationFrame(step));
   }
 
-  /* ── POOL MODE ── */
-  const POOL_BALLS   = 15;                          // standard rack
-  const BALL_D       = isMobile ? 48 : 68;          // pool ball diameter
-  const BALL_R_POOL  = BALL_D / 2;
-  const BALL_R_CUE   = isMobile ? 18 : 22;          // cue ball radius
+  /* ════════════════════════════════════════════
+     POOL MODE — unified rigid-body physics
+     ════════════════════════════════════════════ */
+  const POOL_BALLS  = 15;
+  const BALL_D      = isMobile ? 48 : 68;
+  const BR_POOL     = BALL_D / 2;          /* pool ball radius */
+  const BR_CUE      = isMobile ? 18 : 22;  /* cue ball radius  */
+  const FRICTION    = 0.974;               /* per-frame rolling friction */
+  const RESTITUTION = 0.92;               /* bounciness ball-ball */
+  const WALL_DAMP   = 0.68;               /* energy kept on wall hit */
+  const STOP_V      = 0.18;               /* velocity threshold → stop */
+  const POCKET_R_CORNER = 68;
+  const POCKET_R_SIDE   = 90;
+
   const chaosBorderEl = document.getElementById('chaosBorder');
   const chaosBtn      = document.getElementById('scatterBtn');
 
-  let cueBall    = { x: 0, y: 0, vx: 0, vy: 0, el: null, moving: false, raf: null };
-  let aimCanvas  = null, aimCtx = null, chaosTip = null;
-  let aimActive  = false, aimStartX = 0, aimStartY = 0;
+  let physBalls   = [];                    /* array of physics objects */
+  let physRunning = false, physRaf = null;
   let aliveBlocks = new Set();
 
-  function getPockets(vw, vh) {
+  /* cue-ball DOM state (position mirrored into physBalls) */
+  let cueDom = { el: null };
+  let aimCanvas = null, aimCtx = null, chaosTip = null;
+  let aimActive = false, aimStartX = 0, aimStartY = 0;
+  let physInited = false;
+
+  function pockets() {
+    const vw = window.innerWidth, vh = window.innerHeight;
     return [
-      [0, 0], [vw, 0], [0, vh], [vw, vh],   // 4 corners
-      [0, vh / 2], [vw, vh / 2],              // 2 mid-sides
+      { x: 0,  y: 0,      r: POCKET_R_CORNER },
+      { x: vw, y: 0,      r: POCKET_R_CORNER },
+      { x: 0,  y: vh,     r: POCKET_R_CORNER },
+      { x: vw, y: vh,     r: POCKET_R_CORNER },
+      { x: 0,  y: vh / 2, r: POCKET_R_SIDE   },
+      { x: vw, y: vh / 2, r: POCKET_R_SIDE   },
     ];
   }
 
+  /* ── Button ── */
   if (chaosBtn) {
     chaosBtn.addEventListener('click', () => {
-      chaosActive = !chaosActive;
-      chaosBtn.textContent = chaosActive ? 'Stop the game' : "Let's Shoot Some Pool";
-      chaosActive ? startPool() : stopPool();
+      poolActive = !poolActive;
+      chaosBtn.textContent = poolActive ? 'Stop the game' : "Let's Shoot Some Pool";
+      poolActive ? startPool() : stopPool();
     });
   }
 
+  /* ── Start / Stop ── */
   function startPool() {
     if (chaosBorderEl) chaosBorderEl.classList.add('active');
     document.querySelectorAll('.pocket').forEach(p => p.classList.add('active'));
 
-    /* Transform first 15 blocks to pool balls, hide rest */
-    const poolBlocks = blocks.slice(0, POOL_BALLS);
+    /* Hide excess blocks */
     blocks.slice(POOL_BALLS).forEach(b => {
-      b.style.transition = 'opacity 0.25s ease';
-      b.style.opacity    = '0';
+      b.style.transition = 'opacity .25s ease'; b.style.opacity = '0';
       setTimeout(() => { b.style.display = 'none'; b.style.transition = ''; }, 280);
     });
 
-    poolBlocks.forEach(block => {
-      block._origWidth  = block._origWidth  || block.style.width;
-      block._origHeight = block._origHeight || block.style.height;
-      block.style.transition = `width 0.45s cubic-bezier(0.16,1,0.3,1),
-                                height 0.45s cubic-bezier(0.16,1,0.3,1),
-                                border-radius 0.45s cubic-bezier(0.16,1,0.3,1)`;
+    /* Morph first 15 to pool balls */
+    blocks.slice(0, POOL_BALLS).forEach(block => {
+      block.style.transition = `width .45s cubic-bezier(.16,1,.3,1),
+                                height .45s cubic-bezier(.16,1,.3,1),
+                                border-radius .45s cubic-bezier(.16,1,.3,1)`;
       block.style.width  = BALL_D + 'px';
       block.style.height = BALL_D + 'px';
       block.classList.add('pool-ball');
       setTimeout(() => { block.style.transition = ''; }, 480);
     });
 
-    aliveBlocks = new Set(poolBlocks);
+    aliveBlocks = new Set(blocks.slice(0, POOL_BALLS));
+    physInited  = false;
 
-    /* Rack after morph settles */
-    setTimeout(arrangeRack, 520);
-    /* Spawn cue ball and hint slightly after rack */
-    setTimeout(() => { spawnCueBall(); showTip(); }, 700);
+    /* Rack → cue ball → hint */
+    setTimeout(arrangeRack,  540);
+    setTimeout(spawnCueBall, 720);
+    setTimeout(showTip,      780);
   }
 
   function stopPool() {
     if (chaosBorderEl) chaosBorderEl.classList.remove('active');
     document.querySelectorAll('.pocket').forEach(p => p.classList.remove('active'));
+    if (physRaf) { cancelAnimationFrame(physRaf); physRaf = null; }
+    physRunning = false; physBalls = []; physInited = false;
+    removeCueBall();
+    if (chaosTip) { chaosTip.remove(); chaosTip = null; }
 
-    /* Restore pool balls to original size */
+    /* Restore pool balls to image tiles */
     blocks.slice(0, POOL_BALLS).forEach(block => {
-      block.style.transition = `width 0.4s cubic-bezier(0.16,1,0.3,1),
-                                height 0.4s cubic-bezier(0.16,1,0.3,1),
-                                border-radius 0.4s cubic-bezier(0.16,1,0.3,1)`;
+      block.style.display   = '';
+      block.style.opacity   = '1';
+      block.classList.remove('pool-ball');
+      block.style.transition = `width .4s cubic-bezier(.16,1,.3,1),
+                                height .4s cubic-bezier(.16,1,.3,1),
+                                border-radius .4s cubic-bezier(.16,1,.3,1)`;
       block.style.width  = block._origWidth  || '';
       block.style.height = block._origHeight || '';
-      block.classList.remove('pool-ball');
       block.style.transform = `rotate(${block._rot}deg)`;
       setTimeout(() => { block.style.transition = ''; }, 440);
     });
 
-    /* Restore hidden blocks */
+    /* Restore hidden excess blocks */
     blocks.slice(POOL_BALLS).forEach(block => {
       if (block.style.display === 'none') {
         const bw = parseInt(block._origWidth) || 300;
         const bh = parseInt(block._origHeight) || 200;
-        const x  = 24 + Math.random() * Math.max(0, window.innerWidth  - bw - 48);
-        const y  = headerH + 24 + Math.random() * Math.max(0, window.innerHeight - headerH - bh - 48);
-        block.style.display   = '';
-        block.style.opacity   = '0';
-        block.style.left      = x + 'px';
-        block.style.top       = y + 'px';
+        const x = 24 + Math.random() * Math.max(0, window.innerWidth  - bw - 48);
+        const y = headerH + 24 + Math.random() * Math.max(0, window.innerHeight - headerH - bh - 48);
+        block.style.display = ''; block.style.opacity = '0';
+        block.style.left = x + 'px'; block.style.top = y + 'px';
         block.style.transform = `rotate(${block._rot}deg)`;
-        block.style.transition = 'opacity 0.5s ease';
+        block.style.transition = 'opacity .5s ease';
         requestAnimationFrame(() => {
           block.style.opacity = '1';
           setTimeout(() => { block.style.transition = ''; }, 520);
         });
       }
     });
-
-    /* Also restore any pocketed blocks from first 15 */
-    blocks.slice(0, POOL_BALLS).forEach(block => {
-      if (block.style.display === 'none') {
-        const x = 24 + Math.random() * Math.max(0, window.innerWidth  - BALL_D - 48);
-        const y = headerH + 24 + Math.random() * Math.max(0, window.innerHeight - headerH - BALL_D - 48);
-        block.style.display = '';
-        block.style.left    = x + 'px';
-        block.style.top     = y + 'px';
-        block.style.opacity = '1';
-      }
-    });
-
-    removeCueBall();
-    if (chaosTip) { chaosTip.remove(); chaosTip = null; }
   }
 
-  /* Triangle rack — apex at top, 5 rows (1-2-3-4-5 = 15 balls) */
+  /* ── Rack: standard triangle (apex top, 5 rows) ── */
   function arrangeRack() {
     const D    = BALL_D;
-    const rowH = D * Math.sin(Math.PI / 3);   /* ≈ D × 0.866 */
+    const rowH = D * Math.sin(Math.PI / 3);  /* D × √3/2 */
     const vw   = window.innerWidth;
     const vh   = window.innerHeight;
-
-    /* Apex center: upper-centre of playing area */
     const apexX = vw / 2;
-    const apexY = headerH + (vh - headerH) * 0.22;
+    const apexY = headerH + (vh - headerH) * 0.20;
 
     let idx = 0;
     for (let row = 0; row < 5; row++) {
       const count    = row + 1;
       const rowY     = apexY + row * rowH;
-      const rowStartX = apexX - (row * D) / 2;  /* center each row */
-
+      const rowStartX = apexX - (row * D) / 2;
       for (let col = 0; col < count; col++) {
         const block = blocks[idx++];
         if (!block) continue;
-        const tx  = rowStartX + col * D - D / 2;
-        const ty  = rowY - D / 2;
-        const del = idx * 14;
-
-        block.style.transition = `left 0.6s ${del}ms cubic-bezier(0.16,1,0.3,1),
-                                  top  0.6s ${del}ms cubic-bezier(0.16,1,0.3,1),
-                                  transform 0.6s ${del}ms cubic-bezier(0.16,1,0.3,1)`;
+        const tx = rowStartX + col * D - D / 2;
+        const ty = rowY - D / 2;
+        const dl = idx * 14;
+        block.style.transition = `left .6s ${dl}ms cubic-bezier(.16,1,.3,1),
+                                  top  .6s ${dl}ms cubic-bezier(.16,1,.3,1),
+                                  transform .6s ${dl}ms cubic-bezier(.16,1,.3,1)`;
         block.style.left      = tx + 'px';
         block.style.top       = ty + 'px';
         block.style.transform = 'rotate(0deg)';
-        setTimeout(() => { block.style.transition = ''; }, 650 + del);
+        setTimeout(() => { block.style.transition = ''; }, 660 + dl);
       }
     }
   }
 
-  function spawnCueBall() {
-    if (!chaosActive) return;
-    const D   = BALL_R_CUE * 2;
-    cueBall.el = document.createElement('div');
-    cueBall.el.className = 'chaos-ball';
-    cueBall.el.style.width  = D + 'px';
-    cueBall.el.style.height = D + 'px';
+  /* ── Physics init: build physBalls from current DOM positions ── */
+  function initPhysics() {
+    physBalls = [];
 
-    /* Position cue ball well above bottom bar */
-    cueBall.x = window.innerWidth  / 2;
-    cueBall.y = window.innerHeight * 0.78;
-    updateCueBallPos();
-    document.body.appendChild(cueBall.el);
+    /* Pool balls */
+    Array.from(aliveBlocks).forEach(block => {
+      /* Read current VISUAL position (mid-animation safe) */
+      block.style.transition = '';
+      const rect = block.getBoundingClientRect();
+      block.style.left = rect.left + 'px';
+      block.style.top  = rect.top  + 'px';
+
+      const pb = {
+        x: rect.left + BR_POOL,
+        y: rect.top  + BR_POOL,
+        vx: 0, vy: 0,
+        r: BR_POOL,
+        alive: true,
+        isCue: false,
+        block: block,
+        sync() {
+          if (!this.alive) return;
+          block.style.left = (this.x - BR_POOL) + 'px';
+          block.style.top  = (this.y - BR_POOL) + 'px';
+        }
+      };
+      physBalls.push(pb);
+    });
+
+    /* Cue ball */
+    const cuePB = {
+      x: parseFloat(cueDom.el ? cueDom.el.style.left : window.innerWidth / 2) + BR_CUE,
+      y: parseFloat(cueDom.el ? cueDom.el.style.top  : window.innerHeight * .78) + BR_CUE,
+      vx: 0, vy: 0,
+      r: BR_CUE,
+      alive: true,
+      isCue: true,
+      block: null,
+      sync() {
+        if (!cueDom.el) return;
+        cueDom.el.style.left = (this.x - BR_CUE) + 'px';
+        cueDom.el.style.top  = (this.y - BR_CUE) + 'px';
+      }
+    };
+    physBalls.push(cuePB);
+    physInited = true;
+  }
+
+  /* ── Master physics step ── */
+  function physicsStep() {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const pts = pockets();
+    let anyMoving = false;
+
+    /* 1. Integrate velocity + wall bounce */
+    physBalls.forEach(b => {
+      if (!b.alive) return;
+      b.vx *= FRICTION; b.vy *= FRICTION;
+      b.x  += b.vx;     b.y  += b.vy;
+
+      /* Walls */
+      if (b.x - b.r < 0)        { b.x = b.r;       b.vx =  Math.abs(b.vx) * WALL_DAMP; }
+      if (b.x + b.r > vw)       { b.x = vw - b.r;  b.vx = -Math.abs(b.vx) * WALL_DAMP; }
+      if (b.y - b.r < headerH)  { b.y = headerH + b.r; b.vy = Math.abs(b.vy) * WALL_DAMP; }
+      if (b.y + b.r > vh)       { b.y = vh - b.r;  b.vy = -Math.abs(b.vy) * WALL_DAMP; }
+
+      /* Pocket check (not for cue ball) */
+      if (!b.isCue) {
+        for (const p of pts) {
+          const ddx = b.x - p.x, ddy = b.y - p.y;
+          if (Math.sqrt(ddx*ddx + ddy*ddy) < p.r) {
+            pocketBall(b, p.x, p.y, vw, vh); return;
+          }
+        }
+      }
+
+      if (Math.sqrt(b.vx*b.vx + b.vy*b.vy) > STOP_V) anyMoving = true;
+    });
+
+    /* 2. Ball–ball elastic collisions (all pairs) */
+    for (let i = 0; i < physBalls.length; i++) {
+      if (!physBalls[i].alive) continue;
+      for (let j = i + 1; j < physBalls.length; j++) {
+        if (!physBalls[j].alive) continue;
+        collide(physBalls[i], physBalls[j]);
+      }
+    }
+
+    /* 3. Sync to DOM */
+    physBalls.forEach(b => { if (b.alive) b.sync(); });
+
+    if (anyMoving) {
+      physRaf = requestAnimationFrame(physicsStep);
+    } else {
+      physRunning = false; physRaf = null;
+    }
+  }
+
+  function startPhysics() {
+    if (physRunning) return;
+    physRunning = true;
+    physRaf = requestAnimationFrame(physicsStep);
+  }
+
+  /* Elastic collision between two balls (equal-ish mass) */
+  function collide(a, b) {
+    const dx   = b.x - a.x, dy = b.y - a.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const minD = a.r + b.r;
+    if (dist >= minD || dist === 0) return;
+
+    const nx = dx / dist, ny = dy / dist;
+    const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
+    const dvn = dvx * nx + dvy * ny;
+    if (dvn <= 0) return;              /* already separating */
+
+    /* Impulse (equal mass elastic + restitution) */
+    const j = (1 + RESTITUTION) * dvn / 2;
+    a.vx -= j * nx; a.vy -= j * ny;
+    b.vx += j * nx; b.vy += j * ny;
+
+    /* Separate so they don't stick */
+    const overlap = (minD - dist) / 2;
+    a.x -= nx * overlap; a.y -= ny * overlap;
+    b.x += nx * overlap; b.y += ny * overlap;
+
+    playClack();
+  }
+
+  /* Sink a ball into a pocket */
+  function pocketBall(pb, px, py, vw, vh) {
+    pb.alive = false;
+    aliveBlocks.delete(pb.block);
+    const bl = pb.block;
+    const tx = px < vw / 2 ? -BALL_D - 8 : vw + 8;
+    const ty = py < vh * 0.3 ? -BALL_D - 8
+             : py > vh * 0.7 ? vh + 8
+             : parseFloat(bl.style.top);
+    bl.style.transition = 'left .2s ease-in, top .2s ease-in, transform .2s ease-in, opacity .22s ease-in';
+    bl.style.left      = tx + 'px';
+    bl.style.top       = ty + 'px';
+    bl.style.transform = 'scale(0.08) rotate(60deg)';
+    bl.style.opacity   = '0';
+    playPocket();
+    setTimeout(() => { bl.style.display = 'none'; }, 240);
+  }
+
+  /* ── Cue ball DOM ── */
+  function spawnCueBall() {
+    if (!poolActive) return;
+    cueDom.el = document.createElement('div');
+    cueDom.el.className = 'chaos-ball';
+    const D = BR_CUE * 2;
+    cueDom.el.style.width  = D + 'px';
+    cueDom.el.style.height = D + 'px';
+    cueDom.el.style.left   = (window.innerWidth / 2 - BR_CUE) + 'px';
+    cueDom.el.style.top    = (window.innerHeight * 0.78 - BR_CUE) + 'px';
+    document.body.appendChild(cueDom.el);
 
     aimCanvas = document.createElement('canvas');
-    aimCanvas.id     = 'aimCanvas';
+    aimCanvas.id = 'aimCanvas';
     aimCanvas.width  = window.innerWidth;
     aimCanvas.height = window.innerHeight;
     aimCtx = aimCanvas.getContext('2d');
     document.body.appendChild(aimCanvas);
 
-    cueBall.el.addEventListener('mousedown',  onBallDown);
-    cueBall.el.addEventListener('touchstart', onBallDown, { passive: false });
-    cueBall.el.addEventListener('click', e => e.stopPropagation());
+    cueDom.el.addEventListener('mousedown',  onBallDown);
+    cueDom.el.addEventListener('touchstart', onBallDown, { passive: false });
+    cueDom.el.addEventListener('click', e => e.stopPropagation());
   }
 
   function removeCueBall() {
-    if (cueBall.raf) { cancelAnimationFrame(cueBall.raf); cueBall.raf = null; }
-    cueBall.moving = false;
-    if (cueBall.el)  { cueBall.el.remove();  cueBall.el  = null; }
-    if (aimCanvas)   { aimCanvas.remove();    aimCanvas   = null; aimCtx = null; }
+    if (physRaf) { cancelAnimationFrame(physRaf); physRaf = null; }
+    if (cueDom.el)  { cueDom.el.remove();  cueDom.el  = null; }
+    if (aimCanvas)  { aimCanvas.remove();  aimCanvas  = null; aimCtx = null; }
     aimActive = false;
     window.removeEventListener('mousemove', onAimMove);
     window.removeEventListener('mouseup',   onAimRelease);
@@ -371,18 +485,15 @@
     window.removeEventListener('touchend',  onAimRelease);
   }
 
-  function updateCueBallPos() {
-    if (!cueBall.el) return;
-    cueBall.el.style.left = (cueBall.x - BALL_R_CUE) + 'px';
-    cueBall.el.style.top  = (cueBall.y - BALL_R_CUE) + 'px';
-  }
-
+  /* ── Aiming ── */
   function onBallDown(e) {
-    if (cueBall.moving) return;
+    /* Init physics lazily on first grab */
+    if (!physInited) initPhysics();
+    if (physRunning) return;           /* wait until balls stop */
     e.preventDefault(); e.stopPropagation();
     const { x, y } = getXY(e);
     aimActive = true; aimStartX = x; aimStartY = y;
-    cueBall.el.classList.add('grabbing');
+    cueDom.el.classList.add('grabbing');
     window.addEventListener('mousemove', onAimMove);
     window.addEventListener('mouseup',   onAimRelease);
     window.addEventListener('touchmove', onAimMove, { passive: false });
@@ -397,14 +508,19 @@
     const len = Math.sqrt(dx*dx + dy*dy);
     aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
     if (len < 8) return;
-    const lineLen = Math.min(len * 3, 340);
+
+    const cuePhysBall = physBalls.find(b => b.isCue);
+    const cx = cuePhysBall ? cuePhysBall.x : window.innerWidth / 2;
+    const cy = cuePhysBall ? cuePhysBall.y : window.innerHeight * 0.78;
+    const lineLen = Math.min(len * 3, 360);
+
     aimCtx.save();
     aimCtx.setLineDash([6, 10]);
-    aimCtx.strokeStyle = 'rgba(255,255,255,0.42)';
+    aimCtx.strokeStyle = 'rgba(255,255,255,0.40)';
     aimCtx.lineWidth   = 1.5;
     aimCtx.beginPath();
-    aimCtx.moveTo(cueBall.x, cueBall.y);
-    aimCtx.lineTo(cueBall.x + (dx / len) * lineLen, cueBall.y + (dy / len) * lineLen);
+    aimCtx.moveTo(cx, cy);
+    aimCtx.lineTo(cx + (dx / len) * lineLen, cy + (dy / len) * lineLen);
     aimCtx.stroke();
     aimCtx.restore();
   }
@@ -416,91 +532,30 @@
     const dx = aimStartX - x, dy = aimStartY - y;
     const len = Math.sqrt(dx*dx + dy*dy);
     if (aimCtx) aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
-    if (cueBall.el) cueBall.el.classList.remove('grabbing');
+    if (cueDom.el) cueDom.el.classList.remove('grabbing');
     window.removeEventListener('mousemove', onAimMove);
     window.removeEventListener('mouseup',   onAimRelease);
     window.removeEventListener('touchmove', onAimMove);
     window.removeEventListener('touchend',  onAimRelease);
     if (len < 10) return;
-    const power = Math.min(len * 0.2, 26);
-    cueBall.vx = (dx / len) * power;
-    cueBall.vy = (dy / len) * power;
-    cueBall.moving = true;
-    playTone(520, 290, 0.12, 0.22);
-    ballPhysicsLoop();
-  }
 
-  function ballPhysicsLoop() {
-    if (!chaosActive || !cueBall.moving) return;
-    cueBall.vx *= 0.986; cueBall.vy *= 0.986;
-    cueBall.x  += cueBall.vx; cueBall.y  += cueBall.vy;
-
-    const vw = window.innerWidth, vh = window.innerHeight;
-    if (cueBall.x - BALL_R_CUE < 0)   { cueBall.x = BALL_R_CUE;      cueBall.vx =  Math.abs(cueBall.vx) * 0.75; }
-    if (cueBall.x + BALL_R_CUE > vw)  { cueBall.x = vw - BALL_R_CUE; cueBall.vx = -Math.abs(cueBall.vx) * 0.75; }
-    if (cueBall.y - BALL_R_CUE < 0)   { cueBall.y = BALL_R_CUE;      cueBall.vy =  Math.abs(cueBall.vy) * 0.75; }
-    if (cueBall.y + BALL_R_CUE > vh)  { cueBall.y = vh - BALL_R_CUE; cueBall.vy = -Math.abs(cueBall.vy) * 0.75; }
-    updateCueBallPos();
-
-    /* Circle–circle collision with pool balls */
-    aliveBlocks.forEach(block => {
-      if (block.style.display === 'none') return;
-      const bl = parseFloat(block.style.left) || 0;
-      const bt = parseFloat(block.style.top)  || 0;
-      const blockCX = bl + BALL_R_POOL;
-      const blockCY = bt + BALL_R_POOL;
-      const dx   = cueBall.x - blockCX;
-      const dy   = cueBall.y - blockCY;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const minD = BALL_R_CUE + BALL_R_POOL;
-
-      if (dist < minD && dist > 0) {
-        const nx  = dx / dist, ny = dy / dist;
-        const spd = Math.sqrt(cueBall.vx*cueBall.vx + cueBall.vy*cueBall.vy);
-
-        block.style.transition = '';
-        throwBlock(block, -nx * spd * 3.2, -ny * spd * 3.2);
-
-        const dot = cueBall.vx*nx + cueBall.vy*ny;
-        if (dot < 0) { cueBall.vx -= 1.6*dot*nx; cueBall.vy -= 1.6*dot*ny; }
-        cueBall.x += nx * (minD - dist + 1);
-        cueBall.y += ny * (minD - dist + 1);
-        updateCueBallPos();
-        playTone(400, 210, 0.1, 0.2);
-      }
-    });
-
-    const spd = Math.sqrt(cueBall.vx*cueBall.vx + cueBall.vy*cueBall.vy);
-    if (spd > 0.3) {
-      cueBall.raf = requestAnimationFrame(ballPhysicsLoop);
-    } else {
-      cueBall.moving = false; cueBall.raf = null;
+    /* Power scales linearly with pull distance, no hard cap */
+    const power = Math.min(len * 0.24, 42);
+    const cuePhysBall = physBalls.find(b => b.isCue);
+    if (cuePhysBall) {
+      cuePhysBall.vx = (dx / len) * power;
+      cuePhysBall.vy = (dy / len) * power;
     }
+    playTone(540, 300, 0.1, 0.22);
+    startPhysics();
   }
 
-  function pocketBlock(block, px, py) {
-    throwRAFs.delete(block);
-    aliveBlocks.delete(block);
-    const vw = window.innerWidth, vh = window.innerHeight;
-    /* Fly toward nearest edge */
-    const tx = px < vw / 2 ? -BALL_D - 10 : vw + 10;
-    const ty = py < vh / 2 ? -BALL_D - 10 : py === vh / 2
-      ? parseFloat(block.style.top)        /* mid-side: slide straight off */
-      : vh + 10;
-    block.style.transition = 'left 0.2s ease-in, top 0.2s ease-in, transform 0.2s ease-in, opacity 0.22s ease-in';
-    block.style.left      = (px < vw / 2 ? -BALL_D - 10 : vw + 10) + 'px';
-    block.style.top       = (py < vh / 2 ? -BALL_D - 10 : py > vh / 2 ? vh + 10 : parseFloat(block.style.top)) + 'px';
-    block.style.transform = 'scale(0.1) rotate(60deg)';
-    block.style.opacity   = '0';
-    playTone(100, 50, 0.28, 0.3);
-    setTimeout(() => { block.style.display = 'none'; }, 240);
-  }
-
+  /* ── Hint ── */
   function showTip() {
     if (chaosTip) chaosTip.remove();
     chaosTip = document.createElement('div');
     chaosTip.className = 'chaos-hint';
-    chaosTip.innerHTML = 'Drag the cue ball to aim &middot; Release to shoot<span>Sink the balls into the corners &middot; Click to dismiss</span>';
+    chaosTip.innerHTML = 'Drag the cue ball to aim &middot; Longer pull = harder shot<span>Sink the balls into the 6 pockets &middot; Click to dismiss</span>';
     document.body.appendChild(chaosTip);
     setTimeout(() => { document.addEventListener('click', dismissTip, { once: true }); }, 500);
   }
