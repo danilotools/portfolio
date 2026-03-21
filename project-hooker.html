@@ -225,27 +225,45 @@
     .sp-case-study {
       display: flex;
       flex-direction: column;
-      gap: 20px;
       margin-bottom: 48px;
       padding-bottom: 40px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .sp-case-label {
+    .sp-case-block {
+      padding: 20px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .sp-case-block:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .sp-case-num {
       font-family: 'Roboto', sans-serif;
       font-size: 10px;
       font-weight: 500;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.3);
+      color: var(--green);
       display: block;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    .sp-case-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.88);
+      display: block;
+      margin-bottom: 8px;
     }
 
     .sp-case-text {
       font-family: 'Roboto', sans-serif;
-      font-size: 14px;
-      line-height: 1.75;
+      font-size: 13px;
+      line-height: 1.65;
       color: var(--muted);
       margin: 0;
     }
@@ -332,13 +350,10 @@
           </div>
 
           <div class="sp-meta-row">
-            <dt class="sp-meta-label">Duration</dt>
-            <dd class="sp-meta-value">6 weeks</dd>
-          </div>
-
-          <div class="sp-meta-row">
             <dt class="sp-meta-label">Team</dt>
-            <dd class="sp-meta-value">Solo designer</dd>
+            <dd class="sp-meta-value">
+              <a href="https://www.linkedin.com/in/marija-radulovic/" class="sp-collab-link" target="_blank" rel="noopener">Marija Radulovic</a>
+            </dd>
           </div>
 
           <div class="sp-meta-row">
@@ -368,15 +383,18 @@
         <!-- Case Study -->
         <div class="sp-case-study sp-reveal">
           <div class="sp-case-block">
-            <span class="sp-case-label">The Problem</span>
+            <span class="sp-case-num">01</span>
+            <span class="sp-case-label">Problem</span>
             <p class="sp-case-text">Hooker Furniture had decades of craft behind it but a digital presence that didn't match. The site felt dated and generic — nothing like the warmth and quality of the actual product.</p>
           </div>
           <div class="sp-case-block">
-            <span class="sp-case-label">The Process</span>
+            <span class="sp-case-num">02</span>
+            <span class="sp-case-label">Process</span>
             <p class="sp-case-text">Deep dive into the brand — its heritage, its customers, its competitors. Built a visual language rooted in craft and warmth. Designed in Figma, prepared for seamless dev handoff.</p>
           </div>
           <div class="sp-case-block">
-            <span class="sp-case-label">The Outcome</span>
+            <span class="sp-case-num">03</span>
+            <span class="sp-case-label">Outcome</span>
             <p class="sp-case-text">A premium, responsive design that gives sales reps a better tool and gives customers a clearer path from inspiration to purchase.</p>
           </div>
         </div>
