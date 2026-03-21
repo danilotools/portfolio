@@ -91,8 +91,8 @@
       pointer-events: none;
       z-index: 9986;
       background:
-        linear-gradient(to right,  rgba(199,213,159,0.22) 0%, transparent 12%, transparent 88%, rgba(199,213,159,0.22) 100%),
-        linear-gradient(to bottom, rgba(199,213,159,0.22) 0%, transparent 12%, transparent 88%, rgba(199,213,159,0.22) 100%);
+        linear-gradient(to right,  rgba(199,213,159,0.18) 0%, transparent 5%, transparent 95%, rgba(199,213,159,0.18) 100%),
+        linear-gradient(to bottom, rgba(199,213,159,0.18) 0%, transparent 5%, transparent 95%, rgba(199,213,159,0.18) 100%);
       opacity: 0;
       transition: opacity 0.6s ease;
     }
@@ -101,11 +101,9 @@
       animation: chaos-pulse 3s ease-in-out infinite;
     }
 
-    /* ── Chaos mode: corner pockets ── */
+    /* ── Chaos mode: pockets (4 corners + 2 mid-sides) ── */
     .pocket {
       position: fixed;
-      width: 52px;
-      height: 52px;
       z-index: 9987;
       pointer-events: none;
       opacity: 0;
@@ -116,8 +114,14 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(8, 8, 10, 0.9);
-      border: 1px solid rgba(199, 213, 159, 0.3);
+      background: rgba(6, 6, 8, 0.92);
+      border: 1px solid rgba(199, 213, 159, 0.28);
+    }
+
+    /* Corner pockets — quarter circles */
+    .pocket-tl, .pocket-tr, .pocket-bl, .pocket-br {
+      width: 52px;
+      height: 52px;
     }
     .pocket-tl { top: 0; left: 0; }
     .pocket-tl::before { border-radius: 0 0 100% 0; }
@@ -127,6 +131,34 @@
     .pocket-bl::before { border-radius: 0 100% 0 0; }
     .pocket-br { bottom: 0; right: 0; }
     .pocket-br::before { border-radius: 100% 0 0 0; }
+
+    /* Mid-side pockets — semicircles */
+    .pocket-ml, .pocket-mr {
+      width: 36px;
+      height: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .pocket-ml { left: 0; }
+    .pocket-ml::before { border-radius: 0 100% 100% 0; }
+    .pocket-mr { right: 0; }
+    .pocket-mr::before { border-radius: 100% 0 0 100%; }
+
+    /* ── Pool ball style (chaos mode) ── */
+    .pg-block.pool-ball {
+      border-radius: 50% !important;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.65), inset 0 -2px 5px rgba(0,0,0,0.25) !important;
+      cursor: default !important;
+    }
+    .pg-block.pool-ball::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 36% 28%, rgba(255,255,255,0.38) 0%, transparent 52%);
+      pointer-events: none;
+      z-index: 1;
+    }
 
     /* ── Chaos mode: cue ball ── */
     .chaos-ball {
@@ -298,7 +330,7 @@
   <!-- Bottom bar: Scatter + Player -->
   <div class="bottom-bar">
 
-    <button class="scatter-btn" id="scatterBtn">Start Chaos</button>
+    <button class="scatter-btn" id="scatterBtn">Let's Shoot Some Pool</button>
 
     <!-- Music Player: [Info] | [Controls] | [Progress] -->
     <div class="music-player" id="musicPlayer">
@@ -336,6 +368,8 @@
   <div class="pocket pocket-tr" id="pocketTR"></div>
   <div class="pocket pocket-bl" id="pocketBL"></div>
   <div class="pocket pocket-br" id="pocketBR"></div>
+  <div class="pocket pocket-ml" id="pocketML"></div>
+  <div class="pocket pocket-mr" id="pocketMR"></div>
 
   <!-- Page transition overlay -->
   <div id="page-transition">
