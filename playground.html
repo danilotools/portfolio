@@ -78,6 +78,39 @@
       draggable: false;
     }
 
+    /* ── Chaos Mode ── */
+    .chaos-ball {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 36% 32%, #ffffff 0%, #c8c8c8 100%);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(0,0,0,0.2);
+      cursor: grab;
+      z-index: 9995;
+      pointer-events: all;
+      transition: transform 0.15s ease;
+    }
+    .chaos-ball:hover { transform: scale(1.08); }
+    .chaos-ball.grabbing { cursor: grabbing; transform: scale(1.12); }
+
+    .chaos-hint {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 112px;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 11px;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.07em;
+      text-align: center;
+      pointer-events: none;
+      z-index: 9994;
+      white-space: nowrap;
+      transition: opacity 0.9s ease;
+    }
+
   </style>
 </head>
 <body id="playground">
@@ -193,7 +226,7 @@
   <!-- Bottom bar: Scatter + Player -->
   <div class="bottom-bar">
 
-    <button class="scatter-btn" id="scatterBtn">Scatter</button>
+    <button class="scatter-btn" id="scatterBtn">Start Chaos</button>
 
     <!-- Music Player: [Info] | [Controls] | [Progress] -->
     <div class="music-player" id="musicPlayer">

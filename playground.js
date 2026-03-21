@@ -220,35 +220,196 @@
     throwRAFs.set(block, requestAnimationFrame(step));
   }
 
-  /* ── 14. Scatter all button ── */
-  const scatterBtn = document.getElementById('scatterBtn');
-  if (scatterBtn) {
-    scatterBtn.addEventListener('click', () => {
-      blocks.forEach((block, i) => {
-        const bw  = block.offsetWidth;
-        const bh  = block.offsetHeight;
-        const vw  = window.innerWidth;
-        const vh  = window.innerHeight;
-        const margin = 24;
+  /* ── CHAOS MODE — billiard ball ── */
+  const chaosBtn = document.getElementById('scatterBtn');
+  let   chaosActive = false;
 
-        const x   = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
-        const y   = headerH + margin + Math.random() * Math.max(0, vh - headerH - bh - margin * 2);
-        const rot = (Math.random() - 0.5) * 24;
+  const BALL_R = 18;
+  let ball = { x: 0, y: 0, vx: 0, vy: 0, el: null, moving: false, raf: null };
+  let aimCanvas = null, aimCtx = null, aimHint = null;
+  let aimActive = false, aimStartX = 0, aimStartY = 0;
 
-        block._rot = rot;
-
-        const delay = i * 40;
-        setTimeout(() => {
-          block.style.transition = `left 0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1),
-                                    top  0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1),
-                                    transform 0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1)`;
-          block.style.left      = x + 'px';
-          block.style.top       = y + 'px';
-          block.style.transform = `rotate(${rot}deg)`;
-
-          setTimeout(() => { block.style.transition = ''; }, 660 + delay);
-        }, 0);
-      });
+  if (chaosBtn) {
+    chaosBtn.addEventListener('click', () => {
+      chaosActive = !chaosActive;
+      chaosBtn.textContent = chaosActive ? 'Stop Chaos' : 'Start Chaos';
+      chaosActive ? startChaos() : stopChaos();
     });
+  }
+
+  function startChaos() {
+    /* Ball */
+    ball.el = document.createElement('div');
+    ball.el.className = 'chaos-ball';
+    ball.x = window.innerWidth  / 2;
+    ball.y = window.innerHeight / 2;
+    updateBallPos();
+    document.body.appendChild(ball.el);
+
+    /* Aim canvas */
+    aimCanvas = document.createElement('canvas');
+    aimCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9990;';
+    aimCanvas.width  = window.innerWidth;
+    aimCanvas.height = window.innerHeight;
+    aimCtx = aimCanvas.getContext('2d');
+    document.body.appendChild(aimCanvas);
+
+    /* Hint label */
+    aimHint = document.createElement('p');
+    aimHint.className = 'chaos-hint';
+    aimHint.textContent = 'Drag the ball to aim · release to shoot';
+    document.body.appendChild(aimHint);
+    setTimeout(() => { if (aimHint) aimHint.style.opacity = '0'; }, 3200);
+
+    ball.el.addEventListener('mousedown', onBallDown);
+    ball.el.addEventListener('touchstart', onBallDown, { passive: false });
+  }
+
+  function stopChaos() {
+    if (ball.raf) { cancelAnimationFrame(ball.raf); ball.raf = null; }
+    ball.moving = false;
+    if (ball.el)    { ball.el.remove();    ball.el    = null; }
+    if (aimCanvas)  { aimCanvas.remove();  aimCanvas  = null; aimCtx = null; }
+    if (aimHint)    { aimHint.remove();    aimHint    = null; }
+    aimActive = false;
+    window.removeEventListener('mousemove', onAimMove);
+    window.removeEventListener('mouseup',   onAimRelease);
+    window.removeEventListener('touchmove', onAimMove);
+    window.removeEventListener('touchend',  onAimRelease);
+  }
+
+  function updateBallPos() {
+    if (!ball.el) return;
+    ball.el.style.left = (ball.x - BALL_R) + 'px';
+    ball.el.style.top  = (ball.y - BALL_R) + 'px';
+  }
+
+  function onBallDown(e) {
+    if (ball.moving) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const { x, y } = getXY(e);
+    aimActive = true;
+    aimStartX = x;
+    aimStartY = y;
+    ball.el.classList.add('grabbing');
+    window.addEventListener('mousemove', onAimMove);
+    window.addEventListener('mouseup',   onAimRelease);
+    window.addEventListener('touchmove', onAimMove, { passive: false });
+    window.addEventListener('touchend',  onAimRelease);
+  }
+
+  function onAimMove(e) {
+    if (!aimActive || !aimCtx) return;
+    e.preventDefault();
+    const { x, y } = getXY(e);
+    const dx  = aimStartX - x;   /* shot direction = opposite of drag */
+    const dy  = aimStartY - y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
+    if (len < 6) return;
+    const nx      = dx / len;
+    const ny      = dy / len;
+    const lineLen = Math.min(len * 2.8, 280);
+    aimCtx.save();
+    aimCtx.setLineDash([5, 9]);
+    aimCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+    aimCtx.lineWidth   = 1.5;
+    aimCtx.beginPath();
+    aimCtx.moveTo(ball.x, ball.y);
+    aimCtx.lineTo(ball.x + nx * lineLen, ball.y + ny * lineLen);
+    aimCtx.stroke();
+    aimCtx.restore();
+  }
+
+  function onAimRelease(e) {
+    if (!aimActive) return;
+    aimActive = false;
+    const { x, y } = getXY(e);
+    const dx  = aimStartX - x;
+    const dy  = aimStartY - y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (aimCtx)  aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
+    if (ball.el) ball.el.classList.remove('grabbing');
+    window.removeEventListener('mousemove', onAimMove);
+    window.removeEventListener('mouseup',   onAimRelease);
+    window.removeEventListener('touchmove', onAimMove);
+    window.removeEventListener('touchend',  onAimRelease);
+    if (len < 10) return;
+    const power = Math.min(len * 0.18, 22);
+    ball.vx     = (dx / len) * power;
+    ball.vy     = (dy / len) * power;
+    ball.moving = true;
+    playTone(500, 280, 0.13, 0.22);   /* shoot sound */
+    ballPhysicsLoop();
+  }
+
+  function ballPhysicsLoop() {
+    if (!chaosActive || !ball.moving) return;
+    ball.vx *= 0.984;
+    ball.vy *= 0.984;
+    ball.x  += ball.vx;
+    ball.y  += ball.vy;
+
+    /* Wall bounce */
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (ball.x - BALL_R < 0)   { ball.x = BALL_R;      ball.vx =  Math.abs(ball.vx) * 0.72; }
+    if (ball.x + BALL_R > vw)  { ball.x = vw - BALL_R; ball.vx = -Math.abs(ball.vx) * 0.72; }
+    if (ball.y - BALL_R < 0)   { ball.y = BALL_R;      ball.vy =  Math.abs(ball.vy) * 0.72; }
+    if (ball.y + BALL_R > vh)  { ball.y = vh - BALL_R; ball.vy = -Math.abs(ball.vy) * 0.72; }
+
+    updateBallPos();
+
+    /* Block collision */
+    blocks.forEach(block => {
+      const bl  = parseFloat(block.style.left) || 0;
+      const bt  = parseFloat(block.style.top)  || 0;
+      const bw  = block.offsetWidth;
+      const bh  = block.offsetHeight;
+      /* Closest point on block rect to ball centre */
+      const cx   = Math.max(bl, Math.min(ball.x, bl + bw));
+      const cy   = Math.max(bt, Math.min(ball.y, bt + bh));
+      const dx   = ball.x - cx;
+      const dy   = ball.y - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < BALL_R && dist > 0) {
+        const nx  = dx / dist;
+        const ny  = dy / dist;
+        const spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+
+        /* Block flies away from ball */
+        block.style.transition = '';
+        throwBlock(block, -nx * spd * 3.2, -ny * spd * 3.2);
+
+        /* Block spins on impact */
+        block._rot = (Math.random() - 0.5) * 50;
+        block.style.transition = 'transform 0.38s cubic-bezier(0.25, 1, 0.5, 1)';
+        block.style.transform  = `rotate(${block._rot}deg)`;
+        setTimeout(() => { block.style.transition = ''; }, 420);
+
+        /* Ball reflects off block surface */
+        const dot = ball.vx * nx + ball.vy * ny;
+        if (dot < 0) {
+          ball.vx -= 1.55 * dot * nx;
+          ball.vy -= 1.55 * dot * ny;
+        }
+        /* Push ball out of overlap */
+        ball.x += nx * (BALL_R - dist + 1);
+        ball.y += ny * (BALL_R - dist + 1);
+        updateBallPos();
+
+        playTone(280, 140, 0.1, 0.3);   /* impact thud */
+      }
+    });
+
+    const spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+    if (spd > 0.4) {
+      ball.raf = requestAnimationFrame(ballPhysicsLoop);
+    } else {
+      ball.moving = false;
+      ball.raf    = null;
+    }
   }
 })();
