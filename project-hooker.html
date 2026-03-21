@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="style.css" />
 
   <style>
@@ -220,6 +221,35 @@
       transform: translateY(0);
     }
 
+    /* ── Case study ── */
+    .sp-case-study {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sp-case-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.3);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .sp-case-text {
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+      margin: 0;
+    }
+
     /* ── Mobile ── */
     @media (max-width: 768px) {
       .sp-page {
@@ -292,8 +322,8 @@
         <dl class="sp-meta">
 
           <div class="sp-meta-row">
-            <dt class="sp-meta-label">Role</dt>
-            <dd class="sp-meta-value">UX / UI Design</dd>
+            <dt class="sp-meta-label">What I Did</dt>
+            <dd class="sp-meta-value">Led design end-to-end — research, wireframes, visual design, and Webflow build. Owned the design system and component library throughout.</dd>
           </div>
 
           <div class="sp-meta-row">
@@ -352,6 +382,22 @@
 
       </div>
 
+    </div>
+
+    <!-- Case Study -->
+    <div class="sp-case-study sp-reveal">
+      <div class="sp-case-block">
+        <span class="sp-case-label">The Problem</span>
+        <p class="sp-case-text">Hooker Furniture had decades of craft behind it but a digital presence that didn't match. The site felt dated and generic — nothing like the warmth and quality of the actual product.</p>
+      </div>
+      <div class="sp-case-block">
+        <span class="sp-case-label">The Process</span>
+        <p class="sp-case-text">Deep dive into the brand — its heritage, its customers, its competitors. Built a visual language rooted in craft and warmth. Designed in Figma, brought to life in Webflow.</p>
+      </div>
+      <div class="sp-case-block">
+        <span class="sp-case-label">The Outcome</span>
+        <p class="sp-case-text">A premium, responsive digital experience that gives sales reps a better tool and gives customers a clearer path from inspiration to purchase.</p>
+      </div>
     </div>
 
     <!-- Prev / Next nav -->

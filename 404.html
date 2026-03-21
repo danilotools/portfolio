@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Danilo Hinić</title>
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .nf-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 0;
+    }
+
+    .nf-dot {
+      width: 28px;
+      height: 28px;
+      background: var(--green);
+      border-radius: 6px;
+      margin-bottom: 40px;
+      animation: box-jump 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+      animation-delay: 0.4s;
+    }
+
+    .nf-number {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: clamp(100px, 18vw, 200px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 0.88;
+      letter-spacing: -0.04em;
+      margin: 0 0 32px;
+    }
+
+    .nf-headline {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 500;
+      color: var(--white);
+      margin: 0 0 12px;
+    }
+
+    .nf-sub {
+      font-family: 'Roboto', sans-serif;
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0 0 48px;
+      max-width: 360px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <nav class="nav" aria-label="Primary navigation">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+      </button>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="playground.html" class="nav-link">Playground</a>
+      <a href="resume.html" class="nav-link">Resume</a>
+    </nav>
+    <a href="index.html" class="logo-dot" aria-label="Home"></a>
+    <div class="header-right">
+      <a href="mailto:danilophinic@gmail.com" class="btn-dark">Get in Touch</a>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-menu-nav">
+      <a href="index.html" class="mobile-menu-link">Home</a>
+      <a href="playground.html" class="mobile-menu-link">Playground</a>
+      <a href="resume.html" class="mobile-menu-link">Resume</a>
+    </nav>
+  </div>
+
+  <main class="nf-page" id="main-content">
+    <div class="nf-dot"></div>
+    <h1 class="nf-number">404</h1>
+    <p class="nf-headline">You found the void.</p>
+    <p class="nf-sub">Whatever you were looking for isn't here — it may have moved, or it never existed to begin with.</p>
+    <a href="index.html" class="btn-dark">← Back to Home</a>
+  </main>
+
+  <div id="page-transition">
+    <div class="transition-box"></div>
+  </div>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (menuToggle && mobileMenu) {
+      menuToggle.addEventListener('click', () => {
+        const open = mobileMenu.classList.toggle('is-open');
+        menuToggle.setAttribute('aria-expanded', open);
+      });
+    }
+  </script>
+  <script src="transition.js"></script>
+</body>
+</html>
