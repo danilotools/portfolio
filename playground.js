@@ -73,9 +73,8 @@
   });
 
   function getXY(e) {
-    return e.touches
-      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      : { x: e.clientX, y: e.clientY };
+    const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+    return t ? { x: t.clientX, y: t.clientY } : { x: e.clientX, y: e.clientY };
   }
 
   function onDown(e) {
