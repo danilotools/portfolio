@@ -1,4 +1,5 @@
 (function () {
+  const field  = document.getElementById('playgroundField');
   const blocks = Array.from(document.querySelectorAll('.pg-block'));
 
   /* ── 1. Audio (Web Audio API) ── */
@@ -29,9 +30,10 @@
   /* ── Randomise position & rotation + entrance animation ── */
   const headerH  = (document.querySelector('.header') || {}).offsetHeight || 80;
   const isMobile = window.innerWidth <= 768;
-  const SCALE    = isMobile ? 0.69 : 1;
+  const SCALE    = isMobile ? 0.69 : 1; // 55% baseline + 25% larger
 
   blocks.forEach((block, i) => {
+    /* Resize inline dimensions on mobile so JS positioning math is correct */
     if (isMobile) {
       const origW = parseInt(block.style.width,  10) || block.offsetWidth;
       const origH = parseInt(block.style.height, 10) || block.offsetHeight;
@@ -43,6 +45,7 @@
     const bh  = block.offsetHeight;
     const vw  = window.innerWidth;
     const vh  = window.innerHeight;
+
     const margin = 24;
     const x   = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
     const y   = headerH + margin + Math.random() * Math.max(0, vh - headerH - bh - margin * 2);
@@ -51,33 +54,35 @@
     block.style.left = x + 'px';
     block.style.top  = y + 'px';
     block._rot       = rot;
-    block._hits      = 0;
-    block._alive     = true;
 
     block.style.opacity   = '0';
     block.style.transform = `scale(0.72) rotate(${rot}deg)`;
 
+    /* Faster stagger on mobile (40ms) vs desktop (90ms) */
     const delay = isMobile ? i * 40 : 60 + i * 90;
     setTimeout(() => {
       block.style.transition = `opacity 0.55s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1),
                                 transform 0.55s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1)`;
       block.style.opacity   = '1';
       block.style.transform = `rotate(${rot}deg)`;
-      setTimeout(() => { block.style.transition = ''; }, 560 + delay + 50);
+
+      setTimeout(() => {
+        block.style.transition = '';
+      }, 560 + delay + 50);
     }, 16);
   });
 
   /* ── Drag state ── */
-  let chaosActive = false;   /* declared here so onDown can read it */
-  let active      = null;
-  let startMx     = 0, startMy   = 0;
-  let startLeft   = 0, startTop  = 0;
-  let lastX       = 0, lastY     = 0;
-  let velX        = 0, velY      = 0;
-  let didDrag     = false;
-  let topZ        = 10;
-  const DRAG_SCALE = isMobile ? 1.35 : 1.8;
-  const throwRAFs  = new WeakMap();
+  let active     = null;
+  let startMx    = 0, startMy   = 0;
+  let startLeft  = 0, startTop  = 0;
+  let lastX      = 0, lastY     = 0;
+  let velX       = 0, velY      = 0;
+  let didDrag    = false;
+  let topZ       = 10;
+  let DRAG_SCALE = isMobile ? 1.35 : 1.8;
+
+  const throwRAFs = new WeakMap();
 
   blocks.forEach((block) => {
     block.addEventListener('mousedown', onDown);
@@ -91,7 +96,6 @@
   }
 
   function onDown(e) {
-    if (chaosActive) return;               /* ← blocks are off-limits in chaos mode */
     if (e.button && e.button !== 0) return;
     e.preventDefault();
 
@@ -105,13 +109,17 @@
 
     active.style.zIndex = 9999;
     active.classList.add('is-dragging');
+
     active.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
     active.style.transform  = `scale(${DRAG_SCALE}) rotate(0deg)`;
+
     playPickup();
 
     const { x, y } = getXY(e);
-    startMx   = x;  startMy   = y;
-    lastX     = x;  lastY     = y;
+    startMx   = x;
+    startMy   = y;
+    lastX     = x;
+    lastY     = y;
     startLeft = parseFloat(active.style.left) || 0;
     startTop  = parseFloat(active.style.top)  || 0;
 
@@ -124,14 +132,22 @@
   function onMove(e) {
     if (!active) return;
     e.preventDefault();
+
     const { x, y } = getXY(e);
     const dx = x - startMx;
     const dy = y - startMy;
+
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag = true;
     if (!didDrag) return;
-    velX = velX * 0.72 + (x - lastX) * 0.28;
-    velY = velY * 0.72 + (y - lastY) * 0.28;
-    lastX = x;  lastY = y;
+
+    const rawVX = x - lastX;
+    const rawVY = y - lastY;
+    velX = velX * 0.72 + rawVX * 0.28;
+    velY = velY * 0.72 + rawVY * 0.28;
+
+    lastX = x;
+    lastY = y;
+
     active.style.transition = '';
     active.style.left       = (startLeft + dx) + 'px';
     active.style.top        = (startTop  + dy) + 'px';
@@ -140,44 +156,61 @@
 
   function onUp() {
     if (!active) return;
+
     active.classList.remove('is-dragging');
+
     const released = active;
     const finalVX  = velX;
     const finalVY  = velY;
     const hadDrag  = didDrag;
+
     released.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
     released.style.transform  = `rotate(${released._rot}deg)`;
     released.style.zIndex     = ++topZ;
+
     setTimeout(() => { released.style.transition = ''; }, 550);
+
     playDrop();
-    active = null;  didDrag = false;  velX = 0;  velY = 0;
+
+    active  = null;
+    didDrag = false;
+    velX    = 0;
+    velY    = 0;
+
     window.removeEventListener('mousemove', onMove);
     window.removeEventListener('mouseup',   onUp);
     window.removeEventListener('touchmove', onMove);
     window.removeEventListener('touchend',  onUp);
+
+    /* ── 8. Throw physics (desktop only — too costly on mobile) ── */
     if (!isMobile && hadDrag && (Math.abs(finalVX) > 2 || Math.abs(finalVY) > 2)) {
       throwBlock(released, finalVX * 1.6, finalVY * 1.6);
     }
   }
 
-  /* ── Throw physics ── */
+  /* ── 8. Throw physics ── */
   function throwBlock(block, vx, vy) {
     const FRICTION = 0.88;
     const MIN_V    = 0.4;
+
     function step() {
       vx *= FRICTION;
       vy *= FRICTION;
+
       let nx = parseFloat(block.style.left) + vx;
       let ny = parseFloat(block.style.top)  + vy;
+
       const margin = 8;
       const maxX   = window.innerWidth  - block.offsetWidth  - margin;
       const maxY   = window.innerHeight - block.offsetHeight - margin;
-      if (nx < margin)        { nx = margin;        vx *= -0.3; }
+      if (nx < margin) { nx = margin; vx *= -0.3; }
       if (ny < headerH + margin) { ny = headerH + margin; vy *= -0.3; }
-      if (nx > maxX)          { nx = maxX;          vx *= -0.3; }
-      if (ny > maxY)          { ny = maxY;          vy *= -0.3; }
+      if (nx > maxX) { nx = maxX; vx *= -0.3; }
+      if (ny > maxY) { ny = maxY; vy *= -0.3; }
+
       block.style.left = nx + 'px';
       block.style.top  = ny + 'px';
+
       if (Math.abs(vx) > MIN_V || Math.abs(vy) > MIN_V) {
         throwRAFs.set(block, requestAnimationFrame(step));
       } else {
@@ -187,287 +220,35 @@
     throwRAFs.set(block, requestAnimationFrame(step));
   }
 
-  /* ── CHAOS MODE — billiard ball ── */
-  const chaosBtn  = document.getElementById('scatterBtn');
-  let aliveBlocks = new Set();
+  /* ── 14. Scatter all button ── */
+  const scatterBtn = document.getElementById('scatterBtn');
+  if (scatterBtn) {
+    scatterBtn.addEventListener('click', () => {
+      blocks.forEach((block, i) => {
+        const bw  = block.offsetWidth;
+        const bh  = block.offsetHeight;
+        const vw  = window.innerWidth;
+        const vh  = window.innerHeight;
+        const margin = 24;
 
-  const BALL_R    = 18;
-  let ball        = { x: 0, y: 0, vx: 0, vy: 0, el: null, moving: false, raf: null };
-  let aimCanvas   = null, aimCtx = null, aimHint = null;
-  let aimActive   = false, aimStartX = 0, aimStartY = 0;
+        const x   = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
+        const y   = headerH + margin + Math.random() * Math.max(0, vh - headerH - bh - margin * 2);
+        const rot = (Math.random() - 0.5) * 24;
 
-  if (chaosBtn) {
-    chaosBtn.addEventListener('click', () => {
-      chaosActive = !chaosActive;
-      chaosBtn.textContent = chaosActive ? 'Stop Chaos' : 'Start Chaos';
-      chaosActive ? startChaos() : stopChaos();
+        block._rot = rot;
+
+        const delay = i * 40;
+        setTimeout(() => {
+          block.style.transition = `left 0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1),
+                                    top  0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1),
+                                    transform 0.6s ${delay}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+          block.style.left      = x + 'px';
+          block.style.top       = y + 'px';
+          block.style.transform = `rotate(${rot}deg)`;
+
+          setTimeout(() => { block.style.transition = ''; }, 660 + delay);
+        }, 0);
+      });
     });
-  }
-
-  /* ── Shatter clip-path patterns (2 hit levels, 3 variants each) ── */
-  function shatterClip(hitNum) {
-    const patterns = {
-      1: [
-        'polygon(0% 0%, 100% 0%, 100% 62%, 84% 52%, 76% 68%, 50% 100%, 0% 100%)',
-        'polygon(0% 0%, 80% 0%, 90% 16%, 100% 6%, 100% 100%, 0% 100%)',
-        'polygon(0% 0%, 100% 0%, 100% 100%, 42% 100%, 26% 82%, 0% 92%)',
-      ],
-      2: [
-        'polygon(0% 14%, 20% 0%, 60% 0%, 78% 16%, 100% 8%, 100% 52%, 88% 44%, 76% 60%, 84% 74%, 56% 100%, 0% 100%)',
-        'polygon(0% 0%, 54% 0%, 70% 20%, 100% 12%, 100% 46%, 86% 40%, 72% 54%, 80% 72%, 50% 100%, 0% 100%)',
-        'polygon(0% 0%, 100% 0%, 100% 38%, 88% 28%, 74% 46%, 90% 60%, 72% 100%, 24% 100%, 0% 74%)',
-      ],
-    };
-    const arr = patterns[hitNum] || [];
-    return arr[Math.floor(Math.random() * arr.length)] || '';
-  }
-
-  function hitBlock(block) {
-    if (!block._alive) return;
-    /* Cooldown — don't register two hits in the same 300ms window */
-    const now = Date.now();
-    if (now - (block._lastHit || 0) < 300) return;
-    block._lastHit = now;
-
-    block._hits++;
-
-    if (block._hits >= 3) {
-      destroyBlock(block);
-      return;
-    }
-
-    /* Apply progressive shatter clip */
-    block.style.clipPath = shatterClip(block._hits);
-
-    /* Flash white + spin */
-    block.style.transition = 'filter 0.22s ease, transform 0.38s cubic-bezier(0.25, 1, 0.5, 1)';
-    block.style.filter     = 'brightness(3)';
-    block._rot = (Math.random() - 0.5) * (block._hits * 28 + 20);
-    block.style.transform  = `rotate(${block._rot}deg)`;
-    setTimeout(() => {
-      if (block.style) { block.style.filter = ''; block.style.transition = ''; }
-    }, 300);
-
-    playTone(220, 110, 0.15, 0.26);
-  }
-
-  function destroyBlock(block) {
-    block._alive = false;
-    aliveBlocks.delete(block);
-
-    /* Flash + implode */
-    block.style.transition = 'transform 0.36s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.36s ease, filter 0.12s ease';
-    block.style.filter     = 'brightness(4) saturate(0)';
-    block.style.transform  = `scale(0.04) rotate(${block._rot + (Math.random() > 0.5 ? 210 : -210)}deg)`;
-    block.style.opacity    = '0';
-
-    playTone(90, 45, 0.5, 0.38);
-
-    setTimeout(() => {
-      block.remove();
-      if (aliveBlocks.size === 0) allDestroyed();
-    }, 400);
-  }
-
-  function allDestroyed() {
-    if (chaosBtn) chaosBtn.textContent = 'Canvas Cleared!';
-    setTimeout(() => {
-      chaosActive = false;
-      if (chaosBtn) chaosBtn.textContent = 'Start Chaos';
-      stopChaos();
-    }, 2000);
-  }
-
-  function startChaos() {
-    /* Reset all alive blocks */
-    aliveBlocks = new Set(blocks.filter(b => document.body.contains(b)));
-    aliveBlocks.forEach(block => {
-      block._hits    = 0;
-      block._alive   = true;
-      block._lastHit = 0;
-      block.style.clipPath = '';
-      block.style.filter   = '';
-      block.style.opacity  = '1';
-    });
-
-    /* Ball */
-    ball.el = document.createElement('div');
-    ball.el.className = 'chaos-ball';
-    ball.el.style.zIndex = '9999';
-    ball.x = window.innerWidth  / 2;
-    ball.y = window.innerHeight / 2;
-    updateBallPos();
-    document.body.appendChild(ball.el);
-    /* Stop ball clicks from bubbling (would dismiss hint) */
-    ball.el.addEventListener('click', e => e.stopPropagation());
-
-    /* Aim canvas */
-    aimCanvas = document.createElement('canvas');
-    aimCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9990;';
-    aimCanvas.width  = window.innerWidth;
-    aimCanvas.height = window.innerHeight;
-    aimCtx = aimCanvas.getContext('2d');
-    document.body.appendChild(aimCanvas);
-
-    /* Centered hint — appears as modal, click anywhere to dismiss */
-    aimHint = document.createElement('div');
-    aimHint.className = 'chaos-hint';
-    aimHint.innerHTML = 'Hit each image 3 times to destroy it<span>Click anywhere to dismiss</span>';
-    document.body.appendChild(aimHint);
-    /* Attach dismiss after a short delay so the "Start Chaos" click doesn't trigger it */
-    setTimeout(() => { document.addEventListener('click', dismissHint, { once: true }); }, 400);
-
-    ball.el.addEventListener('mousedown', onBallDown);
-    ball.el.addEventListener('touchstart', onBallDown, { passive: false });
-  }
-
-  function dismissHint() {
-    if (!aimHint) return;
-    aimHint.style.opacity = '0';
-    setTimeout(() => { if (aimHint) { aimHint.remove(); aimHint = null; } }, 900);
-  }
-
-  function stopChaos() {
-    if (ball.raf) { cancelAnimationFrame(ball.raf); ball.raf = null; }
-    ball.moving = false;
-    if (ball.el)   { ball.el.remove();   ball.el   = null; }
-    if (aimCanvas) { aimCanvas.remove(); aimCanvas = null; aimCtx = null; }
-    dismissHint();
-    document.removeEventListener('click', dismissHint);
-    aimActive = false;
-    window.removeEventListener('mousemove', onAimMove);
-    window.removeEventListener('mouseup',   onAimRelease);
-    window.removeEventListener('touchmove', onAimMove);
-    window.removeEventListener('touchend',  onAimRelease);
-  }
-
-  function updateBallPos() {
-    if (!ball.el) return;
-    ball.el.style.left = (ball.x - BALL_R) + 'px';
-    ball.el.style.top  = (ball.y - BALL_R) + 'px';
-  }
-
-  function onBallDown(e) {
-    if (ball.moving) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const { x, y } = getXY(e);
-    aimActive = true;
-    aimStartX = x;
-    aimStartY = y;
-    ball.el.classList.add('grabbing');
-    window.addEventListener('mousemove', onAimMove);
-    window.addEventListener('mouseup',   onAimRelease);
-    window.addEventListener('touchmove', onAimMove, { passive: false });
-    window.addEventListener('touchend',  onAimRelease);
-  }
-
-  function onAimMove(e) {
-    if (!aimActive || !aimCtx) return;
-    e.preventDefault();
-    const { x, y } = getXY(e);
-    const dx  = aimStartX - x;
-    const dy  = aimStartY - y;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
-    if (len < 6) return;
-    const nx      = dx / len;
-    const ny      = dy / len;
-    const lineLen = Math.min(len * 2.8, 280);
-    aimCtx.save();
-    aimCtx.setLineDash([5, 9]);
-    aimCtx.strokeStyle = 'rgba(255,255,255,0.5)';
-    aimCtx.lineWidth   = 1.5;
-    aimCtx.beginPath();
-    aimCtx.moveTo(ball.x, ball.y);
-    aimCtx.lineTo(ball.x + nx * lineLen, ball.y + ny * lineLen);
-    aimCtx.stroke();
-    aimCtx.restore();
-  }
-
-  function onAimRelease(e) {
-    if (!aimActive) return;
-    aimActive = false;
-    const { x, y } = getXY(e);
-    const dx  = aimStartX - x;
-    const dy  = aimStartY - y;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    if (aimCtx)  aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
-    if (ball.el) ball.el.classList.remove('grabbing');
-    window.removeEventListener('mousemove', onAimMove);
-    window.removeEventListener('mouseup',   onAimRelease);
-    window.removeEventListener('touchmove', onAimMove);
-    window.removeEventListener('touchend',  onAimRelease);
-    if (len < 10) return;
-    const power = Math.min(len * 0.18, 22);
-    ball.vx     = (dx / len) * power;
-    ball.vy     = (dy / len) * power;
-    ball.moving = true;
-    playTone(500, 280, 0.13, 0.22);
-    ballPhysicsLoop();
-  }
-
-  function ballPhysicsLoop() {
-    if (!chaosActive || !ball.moving) return;
-    ball.vx *= 0.984;
-    ball.vy *= 0.984;
-    ball.x  += ball.vx;
-    ball.y  += ball.vy;
-
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    if (ball.x - BALL_R < 0)  { ball.x = BALL_R;      ball.vx =  Math.abs(ball.vx) * 0.72; }
-    if (ball.x + BALL_R > vw) { ball.x = vw - BALL_R; ball.vx = -Math.abs(ball.vx) * 0.72; }
-    if (ball.y - BALL_R < 0)  { ball.y = BALL_R;      ball.vy =  Math.abs(ball.vy) * 0.72; }
-    if (ball.y + BALL_R > vh) { ball.y = vh - BALL_R; ball.vy = -Math.abs(ball.vy) * 0.72; }
-    updateBallPos();
-
-    aliveBlocks.forEach(block => {
-      if (!block._alive) return;
-      const bl   = parseFloat(block.style.left) || 0;
-      const bt   = parseFloat(block.style.top)  || 0;
-      const bw   = block.offsetWidth;
-      const bh   = block.offsetHeight;
-      const cx   = Math.max(bl, Math.min(ball.x, bl + bw));
-      const cy   = Math.max(bt, Math.min(ball.y, bt + bh));
-      const ddx  = ball.x - cx;
-      const ddy  = ball.y - cy;
-      const dist = Math.sqrt(ddx * ddx + ddy * ddy);
-
-      if (dist < BALL_R && dist > 0) {
-        const nx  = ddx / dist;
-        const ny  = ddy / dist;
-        const spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-
-        hitBlock(block);
-
-        if (block._alive) {
-          /* Throw block away from ball */
-          const raf = throwRAFs.get(block);
-          if (raf) cancelAnimationFrame(raf);
-          block.style.transition = '';
-          throwBlock(block, -nx * spd * 3.2, -ny * spd * 3.2);
-        }
-
-        /* Ball reflects */
-        const dot = ball.vx * nx + ball.vy * ny;
-        if (dot < 0) {
-          ball.vx -= 1.55 * dot * nx;
-          ball.vy -= 1.55 * dot * ny;
-        }
-        /* Resolve penetration */
-        ball.x += nx * (BALL_R - dist + 1);
-        ball.y += ny * (BALL_R - dist + 1);
-        updateBallPos();
-      }
-    });
-
-    const spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-    if (spd > 0.4) {
-      ball.raf = requestAnimationFrame(ballPhysicsLoop);
-    } else {
-      ball.moving = false;
-      ball.raf    = null;
-    }
   }
 })();

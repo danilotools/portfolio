@@ -78,56 +78,6 @@
       draggable: false;
     }
 
-    /* ── Chaos Mode ── */
-    .chaos-ball {
-      position: fixed;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 36% 32%, #ffffff 0%, #c8c8c8 100%);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(0,0,0,0.2);
-      cursor: grab;
-      z-index: 9995;
-      pointer-events: all;
-      transition: transform 0.15s ease;
-    }
-    .chaos-ball:hover { transform: scale(1.08); }
-    .chaos-ball.grabbing { cursor: grabbing; transform: scale(1.12); }
-
-    .chaos-hint {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      margin: 0;
-      padding: 28px 40px;
-      background: rgba(22, 21, 24, 0.9);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      font-family: 'Roboto', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.9);
-      letter-spacing: 0.01em;
-      text-align: center;
-      pointer-events: all;
-      cursor: pointer;
-      z-index: 9994;
-      white-space: nowrap;
-      transition: opacity 0.9s ease;
-    }
-    .chaos-hint span {
-      display: block;
-      margin-top: 8px;
-      font-size: 11px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.36);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
   </style>
 </head>
 <body id="playground">
@@ -243,7 +193,7 @@
   <!-- Bottom bar: Scatter + Player -->
   <div class="bottom-bar">
 
-    <button class="scatter-btn" id="scatterBtn">Start Chaos</button>
+    <button class="scatter-btn" id="scatterBtn">Scatter</button>
 
     <!-- Music Player: [Info] | [Controls] | [Progress] -->
     <div class="music-player" id="musicPlayer">
