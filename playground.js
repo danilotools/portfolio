@@ -195,7 +195,7 @@
   if (chaosBtn) {
     chaosBtn.addEventListener('click', () => {
       poolActive = !poolActive;
-      chaosBtn.textContent = poolActive ? 'Stop the game' : "Let's Shoot Some Pool";
+      chaosBtn.textContent = poolActive ? 'Stop the game' : "🎱 Let's Shoot Some Pool";
       poolActive ? startPool() : stopPool();
     });
   }
@@ -239,35 +239,57 @@
     removeCueBall();
     if (chaosTip) { chaosTip.remove(); chaosTip = null; }
 
-    /* Restore pool balls to image tiles */
-    blocks.slice(0, POOL_BALLS).forEach(block => {
-      block.style.display   = '';
-      block.style.opacity   = '1';
+    /* Restore all blocks as image tiles and scatter them */
+    const vw = window.innerWidth, vh = window.innerHeight;
+
+    blocks.slice(0, POOL_BALLS).forEach((block, i) => {
+      block.style.display = '';
       block.classList.remove('pool-ball');
-      block.style.transition = `width .4s cubic-bezier(.16,1,.3,1),
-                                height .4s cubic-bezier(.16,1,.3,1),
-                                border-radius .4s cubic-bezier(.16,1,.3,1)`;
+      /* First: snap to circle size with no transition so we start from a clean state */
+      block.style.transition = 'none';
       block.style.width  = block._origWidth  || '';
       block.style.height = block._origHeight || '';
-      block.style.transform = `rotate(${block._rot}deg)`;
-      setTimeout(() => { block.style.transition = ''; }, 440);
+      const bw = parseInt(block._origWidth)  || block.offsetWidth;
+      const bh = parseInt(block._origHeight) || block.offsetHeight;
+      const x  = 24 + Math.random() * Math.max(0, vw - bw - 48);
+      const y  = headerH + 24 + Math.random() * Math.max(0, vh - headerH - bh - 48);
+      const rot = (Math.random() - 0.5) * 28;
+      block._rot = rot;
+      block.style.transform = `scale(0.6) rotate(${rot}deg)`;
+      block.style.opacity = '0';
+      block.style.left = x + 'px';
+      block.style.top  = y + 'px';
+      /* Staggered fly-in */
+      const delay = 40 + i * 55;
+      setTimeout(() => {
+        block.style.transition = `opacity .45s ${delay}ms cubic-bezier(.16,1,.3,1),
+                                  transform .45s ${delay}ms cubic-bezier(.16,1,.3,1)`;
+        block.style.opacity   = '1';
+        block.style.transform = `rotate(${rot}deg)`;
+        setTimeout(() => { block.style.transition = ''; }, 460 + delay);
+      }, 16);
     });
 
     /* Restore hidden excess blocks */
-    blocks.slice(POOL_BALLS).forEach(block => {
+    blocks.slice(POOL_BALLS).forEach((block, i) => {
       if (block.style.display === 'none') {
         const bw = parseInt(block._origWidth) || 300;
         const bh = parseInt(block._origHeight) || 200;
-        const x = 24 + Math.random() * Math.max(0, window.innerWidth  - bw - 48);
-        const y = headerH + 24 + Math.random() * Math.max(0, window.innerHeight - headerH - bh - 48);
+        const x = 24 + Math.random() * Math.max(0, vw - bw - 48);
+        const y = headerH + 24 + Math.random() * Math.max(0, vh - headerH - bh - 48);
+        const rot = (Math.random() - 0.5) * 28;
+        block._rot = rot;
         block.style.display = ''; block.style.opacity = '0';
         block.style.left = x + 'px'; block.style.top = y + 'px';
-        block.style.transform = `rotate(${block._rot}deg)`;
-        block.style.transition = 'opacity .5s ease';
-        requestAnimationFrame(() => {
-          block.style.opacity = '1';
-          setTimeout(() => { block.style.transition = ''; }, 520);
-        });
+        block.style.transform = `scale(0.6) rotate(${rot}deg)`;
+        const delay = 40 + (POOL_BALLS + i) * 55;
+        setTimeout(() => {
+          block.style.transition = `opacity .45s ${delay}ms cubic-bezier(.16,1,.3,1),
+                                    transform .45s ${delay}ms cubic-bezier(.16,1,.3,1)`;
+          block.style.opacity   = '1';
+          block.style.transform = `rotate(${rot}deg)`;
+          setTimeout(() => { block.style.transition = ''; }, 460 + delay);
+        }, 16);
       }
     });
   }
