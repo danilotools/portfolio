@@ -16,8 +16,8 @@
     .sp-page {
       padding-top: 120px;
       padding-bottom: 120px;
-      padding-left:  var(--side-pad);
-      padding-right: var(--side-pad);
+      padding-left:  clamp(20px, 5vw, 80px);
+      padding-right: clamp(20px, 5vw, 80px);
     }
 
     .sp-grid {
@@ -86,8 +86,8 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .sp-meta-row:first-child {
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    .sp-meta-row:last-child {
+      border-bottom: none;
     }
 
     .sp-meta-label {
