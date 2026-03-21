@@ -66,44 +66,4 @@
     overlay.style.pointerEvents = 'none';
   }, 1200);
 
-  /* ── Intercept internal link clicks ──────────────────────────── */
-  document.addEventListener('click', (e) => {
-    const link = e.target.closest('a[href]');
-    if (!link) return;
-
-    const href = link.getAttribute('href');
-    const resolvedHref = new URL(href, location.href).href;
-
-    if (
-      !href ||
-      href.startsWith('#') ||
-      href.startsWith('javascript') ||
-      href.startsWith('mailto') ||
-      link.target === '_blank' ||
-      (link.hostname && link.hostname !== location.hostname) ||
-      resolvedHref === location.href
-    ) return;
-
-    e.preventDefault();
-
-    // Snap overlay to below viewport (instant, no transition)
-    overlay.style.transition    = 'none';
-    overlay.style.transform     = 'translateY(100%)';
-    overlay.style.pointerEvents = 'all';
-
-    animateBox();
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        // Slide up to cover — fast ease-in so it feels decisive
-        overlay.style.transition = 'transform 0.38s cubic-bezier(0.7, 0, 0.84, 0)';
-        overlay.style.transform  = 'translateY(0)';
-      });
-    });
-
-    // Navigate after box + cover have both completed (0.64s box, 0.38s cover → 750ms)
-    setTimeout(() => {
-      window.location.href = href;
-    }, 750);
-  });
 })();

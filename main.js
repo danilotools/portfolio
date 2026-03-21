@@ -16,6 +16,7 @@ const PROJECTS = [
     image: 'https://picsum.photos/seed/laurel202/1200/674',
     iconType: 'laurel',
     iconSrc: 'https://www.figma.com/api/mcp/asset/6e5bbd7c-7f70-4e46-ab62-8fdab9bc2001',
+    link: 'project-lwp.html',
   },
   {
     name: 'Supercluster Studio',
@@ -23,6 +24,7 @@ const PROJECTS = [
     image: 'https://picsum.photos/seed/supercluster303/1200/674',
     iconType: 'sc',
     iconSrc: 'https://www.figma.com/api/mcp/asset/8ce9105c-1697-456e-a8ab-79893b0df028',
+    link: 'project-supercluster.html',
   },
 ];
 

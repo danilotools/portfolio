@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hooker Furniture — Danilo Hinić</title>
-  <meta name="description" content="Hooker Furniture project — UX/UI design case study by Danilo Hinić." />
+  <title>Laurel Wealth Planning — Danilo Hinić</title>
+  <meta name="description" content="Laurel Wealth Planning project — UX/UI design case study by Danilo Hinić." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* ── Page layout ── */
     .sp-page {
       padding-top: 120px;
       padding-bottom: 120px;
@@ -27,7 +26,6 @@
       align-items: start;
     }
 
-    /* ── Left sidebar ── */
     .sp-sidebar {
       position: sticky;
       top: 110px;
@@ -72,7 +70,6 @@
       margin-bottom: 32px;
     }
 
-    /* ── Metadata rows ── */
     .sp-meta {
       display: flex;
       flex-direction: column;
@@ -125,12 +122,8 @@
       border-color: var(--green);
     }
 
-    .sp-meta-link svg {
-      opacity: 0.5;
-      flex-shrink: 0;
-    }
+    .sp-meta-link svg { opacity: 0.5; flex-shrink: 0; }
 
-    /* Collaborator link (green underline style matching the site) */
     .sp-collab-link {
       color: var(--green);
       text-decoration: none;
@@ -139,11 +132,8 @@
       transition: border-color 0.18s;
     }
 
-    .sp-collab-link:hover {
-      border-color: var(--green);
-    }
+    .sp-collab-link:hover { border-color: var(--green); }
 
-    /* ── Right: image stack ── */
     .sp-images {
       display: flex;
       flex-direction: column;
@@ -167,9 +157,8 @@
     /* ── Prev / Next project nav ── */
     .sp-proj-nav {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
-      gap: 40px;
       padding-top: 64px;
       margin-top: 80px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -187,7 +176,7 @@
     .sp-proj-nav-link:hover { opacity: 0.55; }
 
     .sp-proj-nav-link--prev { text-align: left; }
-    .sp-proj-nav-link--next { text-align: right; margin-left: auto; }
+    .sp-proj-nav-link--next { text-align: right; }
 
     .sp-proj-nav-dir {
       font-family: 'Roboto', sans-serif;
@@ -217,27 +206,15 @@
       transform: translateY(0);
     }
 
-    /* ── Mobile ── */
     @media (max-width: 768px) {
-      .sp-page {
-        padding-top: 100px;
-        padding-bottom: 80px;
-      }
-
-      .sp-grid {
-        grid-template-columns: 1fr;
-        gap: 48px;
-      }
-
-      .sp-sidebar {
-        position: static;
-      }
+      .sp-page { padding-top: 100px; padding-bottom: 80px; }
+      .sp-grid { grid-template-columns: 1fr; gap: 48px; }
+      .sp-sidebar { position: static; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <nav class="nav" aria-label="Primary navigation">
       <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
@@ -255,7 +232,6 @@
     </div>
   </header>
 
-  <!-- Mobile navigation overlay -->
   <div class="mobile-menu" id="mobileMenu">
     <nav class="mobile-menu-nav">
       <a href="index.html" class="mobile-menu-link">Home</a>
@@ -271,20 +247,17 @@
       <!-- ── LEFT SIDEBAR ── -->
       <aside class="sp-sidebar sp-reveal">
 
-        <!-- Identity -->
         <div class="sp-project-identity">
           <div class="sp-icon">
-            <img src="https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6" alt="Hooker Furniture logo" />
+            <img src="https://www.figma.com/api/mcp/asset/6e5bbd7c-7f70-4e46-ab62-8fdab9bc2001" alt="Laurel Wealth Planning logo" />
           </div>
-          <span class="sp-project-name">Hooker Furniture</span>
+          <span class="sp-project-name">Laurel Wealth Planning</span>
         </div>
 
-        <!-- Description -->
         <p class="sp-description">
-          Elevating home living through timeless, bold design. A full redesign of the Hooker Furniture digital experience — bringing warmth, clarity, and craftsmanship to the screen.
+          Redesigning the whole website from the ground up — crafting a trustworthy, modern digital experience for a wealth management firm.
         </p>
 
-        <!-- Metadata -->
         <dl class="sp-meta">
 
           <div class="sp-meta-row">
@@ -299,23 +272,21 @@
 
           <div class="sp-meta-row">
             <dt class="sp-meta-label">Duration</dt>
-            <dd class="sp-meta-value"><!-- e.g. 12 weeks --></dd>
+            <dd class="sp-meta-value"><!-- e.g. 8 weeks --></dd>
           </div>
 
           <div class="sp-meta-row">
             <dt class="sp-meta-label">Collaborators</dt>
             <dd class="sp-meta-value">
-              <!-- Add collaborator names + links below, e.g.:
-              <a href="https://linkedin.com/in/..." class="sp-collab-link" target="_blank" rel="noopener">John Doe</a>
-              -->
+              <!-- Add collaborator names + links here -->
             </dd>
           </div>
 
           <div class="sp-meta-row">
             <dt class="sp-meta-label">Live Site</dt>
             <dd class="sp-meta-value">
-              <a href="https://www.hookerfurniture.com" class="sp-meta-link" target="_blank" rel="noopener">
-                hookerfurniture.com
+              <a href="#" class="sp-meta-link" target="_blank" rel="noopener">
+                <!-- site URL -->
                 <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
                   <path d="M2 9L9 2M9 2H4.5M9 2V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -330,19 +301,19 @@
       <div class="sp-images">
 
         <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/hooker-01/1200/720" alt="Hooker Furniture — Hero section" />
+          <img src="https://picsum.photos/seed/lwp-01/1200/720" alt="Laurel Wealth Planning — Hero" />
         </div>
 
         <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/hooker-02/1200/720" alt="Hooker Furniture — Product listing" />
+          <img src="https://picsum.photos/seed/lwp-02/1200/720" alt="Laurel Wealth Planning — Services" />
         </div>
 
         <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/hooker-03/1200/720" alt="Hooker Furniture — Product detail" />
+          <img src="https://picsum.photos/seed/lwp-03/1200/720" alt="Laurel Wealth Planning — About" />
         </div>
 
         <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/hooker-04/1200/720" alt="Hooker Furniture — Mobile view" />
+          <img src="https://picsum.photos/seed/lwp-04/1200/720" alt="Laurel Wealth Planning — Contact" />
         </div>
 
       </div>
@@ -351,15 +322,18 @@
 
     <!-- Prev / Next nav -->
     <nav class="sp-proj-nav" aria-label="Project navigation">
-      <a href="project-lwp.html" class="sp-proj-nav-link sp-proj-nav-link--next">
+      <a href="project-hooker.html" class="sp-proj-nav-link sp-proj-nav-link--prev">
+        <span class="sp-proj-nav-dir">← Previous</span>
+        <span class="sp-proj-nav-name">Hooker Furniture</span>
+      </a>
+      <a href="project-supercluster.html" class="sp-proj-nav-link sp-proj-nav-link--next">
         <span class="sp-proj-nav-dir">Next →</span>
-        <span class="sp-proj-nav-name">Laurel Wealth Planning</span>
+        <span class="sp-proj-nav-name">Supercluster Studio</span>
       </a>
     </nav>
 
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <p class="footer-copy">Design isn't a conformity. It's a necessity!</p>
     <div class="footer-links">
@@ -382,13 +356,11 @@
     </div>
   </footer>
 
-  <!-- Page transition overlay -->
   <div id="page-transition">
     <div class="transition-box"></div>
   </div>
 
   <script>
-    /* ── Mobile menu toggle ── */
     const menuToggle = document.getElementById('menuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     if (menuToggle && mobileMenu) {
@@ -398,7 +370,6 @@
       });
     }
 
-    /* ── Scroll reveal ── */
     const revealEls = document.querySelectorAll('.sp-reveal');
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
