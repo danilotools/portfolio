@@ -49,7 +49,7 @@ html, body {
   color: var(--white);
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip doesn't create a scroll container — hidden does and breaks position:sticky */
 }
 
 /* ── HEADER ── */
