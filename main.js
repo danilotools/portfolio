@@ -8,6 +8,7 @@ const PROJECTS = [
     image: 'https://picsum.photos/seed/hooker101/1200/674',
     iconType: 'frame',
     iconSrc: 'https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6',
+    link: 'project-hooker.html',
   },
   {
     name: 'Laurel Wealth Planning',
@@ -102,6 +103,14 @@ avatarBtns.forEach((btn) => {
   btn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') switchProject(Number(btn.dataset.index));
   });
+});
+
+/* ─────────────────────────────────────────────
+   Card click — navigate to project page
+───────────────────────────────────────────── */
+card.addEventListener('click', () => {
+  const link = PROJECTS[activeIndex].link;
+  if (link) window.location.href = link;
 });
 
 /* ─────────────────────────────────────────────
