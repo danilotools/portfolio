@@ -1276,10 +1276,10 @@ a.btn-dark {
 /* ── Bottom bar: transparent on desktop (children are independently fixed) ── */
 .bottom-bar { display: contents; }
 
-/* ── Scatter button — desktop: fixed above player ── */
+/* ── Scatter button — desktop: fixed bottom center ── */
 .scatter-btn {
   position: fixed;
-  bottom: 96px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 500;
