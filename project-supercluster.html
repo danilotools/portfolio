@@ -25,6 +25,10 @@
       gap: 80px;
     }
 
+    .sp-sidebar-col {
+      /* grid item — stretches full row height so sticky has room */
+    }
+
     .sp-sidebar {
       position: sticky;
       top: 110px;
@@ -244,6 +248,7 @@
     <div class="sp-grid">
 
       <!-- ── LEFT SIDEBAR ── -->
+      <div class="sp-sidebar-col">
       <aside class="sp-sidebar sp-reveal">
 
         <div class="sp-project-identity">
@@ -295,6 +300,7 @@
 
         </dl>
       </aside>
+      </div>
 
       <!-- ── RIGHT: IMAGES ── -->
       <div class="sp-images">
