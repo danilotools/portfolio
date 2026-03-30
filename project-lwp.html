@@ -277,10 +277,23 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 2px;
       z-index: 1000;
-      background: rgba(255,255,255,0.05);
       pointer-events: none;
+      padding: 10px 28px 0;
+    }
+    .sp-progress-label {
+      display: block;
+      font-family: 'Roboto', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--green, #c7d59f);
+      margin-bottom: 6px;
+    }
+    .sp-progress-track {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
     }
     .sp-progress-fill {
       height: 100%;
@@ -293,7 +306,10 @@
 <body>
 
   <!-- Scroll progress -->
-  <div class="sp-progress"><div class="sp-progress-fill" id="spProgressFill"></div></div>
+  <div class="sp-progress">
+    <span class="sp-progress-label" id="spProgressLabel">0%</span>
+    <div class="sp-progress-track"><div class="sp-progress-fill" id="spProgressFill"></div></div>
+  </div>
 
   <header class="header">
     <nav class="nav" aria-label="Primary navigation">
@@ -454,13 +470,15 @@
     }
 
     /* ── Scroll progress bar ── */
-    const progressFill = document.getElementById('spProgressFill');
-    const imagesCol    = document.querySelector('.sp-images');
+    const progressFill  = document.getElementById('spProgressFill');
+    const progressLabel = document.getElementById('spProgressLabel');
+    const imagesCol     = document.querySelector('.sp-images');
     function updateProgress() {
       const start = imagesCol.offsetTop;
       const end   = imagesCol.offsetTop + imagesCol.offsetHeight - window.innerHeight;
       const pct   = Math.max(0, Math.min(100, (window.scrollY - start) / (end - start) * 100));
-      progressFill.style.width = pct + '%';
+      progressFill.style.width  = pct + '%';
+      progressLabel.textContent = Math.round(pct) + '%';
     }
     window.addEventListener('scroll', updateProgress, { passive: true });
     updateProgress();
