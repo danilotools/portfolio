@@ -1479,3 +1479,80 @@ a.btn-dark {
   transform-origin: center;
   flex-shrink: 0;
 }
+
+/* ── Puzzle mode — two game buttons side by side on desktop ── */
+#scatterBtn { transform: translateX(calc(-100% - 6px)); }
+#scatterBtn:hover  { transform: translateX(calc(-100% - 6px)) scale(1.04); }
+#scatterBtn:active { transform: translateX(calc(-100% - 6px)) scale(0.97); }
+
+#puzzleBtn {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(6px);
+  animation: bar-rise 0.7s 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+#puzzleBtn:hover  { transform: translateX(6px) scale(1.04); }
+#puzzleBtn:active { transform: translateX(6px) scale(0.97); }
+
+/* Ghost grid overlay */
+.puzzle-ghost {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.puzzle-ghost.active { opacity: 1; }
+.puzzle-ghost-cell {
+  position: absolute;
+  border: 1px dashed rgba(199, 213, 159, 0.22);
+  border-radius: 4px;
+  transition: opacity 0.25s ease;
+}
+.puzzle-ghost-cell.filled { opacity: 0; }
+
+/* Puzzle pieces */
+.pg-block.puzzle-piece {
+  background-repeat: no-repeat !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.55) !important;
+  cursor: grab !important;
+}
+.pg-block.puzzle-piece img { opacity: 0 !important; }
+.pg-block.puzzle-piece.pz-solved {
+  cursor: default !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Reference thumbnail */
+.puzzle-thumb {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 96px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 6px;
+  opacity: 0.5;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+}
+
+@media (max-width: 768px) {
+  #scatterBtn { transform: none; }
+  #scatterBtn:hover  { transform: scale(1.04); }
+  #scatterBtn:active { transform: scale(0.97); }
+  #puzzleBtn {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    animation: none;
+  }
+  #puzzleBtn:hover  { transform: scale(1.04); }
+  #puzzleBtn:active { transform: scale(0.97); }
+}

@@ -63,7 +63,8 @@
   /* ── Drag (normal mode) ── */
   let active = null, startMx = 0, startMy = 0, startLeft = 0, startTop = 0;
   let lastX = 0, lastY = 0, velX = 0, velY = 0, didDrag = false, topZ = 10;
-  let poolActive = false;
+  let poolActive   = false;
+  let puzzleActive = false;
   const DRAG_SCALE = isMobile ? 1.35 : 1.8;
   const throwRAFs  = new WeakMap();
 
@@ -78,7 +79,7 @@
   }
 
   function onDown(e) {
-    if (poolActive) return;
+    if (poolActive || puzzleActive) return;
     if (e.button && e.button !== 0) return;
     e.preventDefault();
     const raf = throwRAFs.get(e.currentTarget);
@@ -585,6 +586,234 @@
     if (!chaosTip) return;
     chaosTip.style.opacity = '0';
     setTimeout(() => { if (chaosTip) { chaosTip.remove(); chaosTip = null; } }, 850);
+  }
+
+  /* ═══════════════════════════════════════════
+     PUZZLE MODE
+  ═══════════════════════════════════════════ */
+  const PUZZLE_COLS = 3;
+  const PUZZLE_ROWS = 5;
+  const PUZZLE_IMG  = 'images/playground/01-tap-hero.webp';
+  const SNAP_DIST   = 52;
+
+  let puzzleSolved  = 0;
+  let puzzleGhostEl = null;
+  let PIECE_W = 0, PIECE_H = 0, pGridX = 0, pGridY = 0;
+  let pzPiece = null, pzMx0 = 0, pzMy0 = 0, pzLeft0 = 0, pzTop0 = 0;
+
+  const puzzleBtn = document.getElementById('puzzleBtn');
+  if (puzzleBtn) {
+    puzzleBtn.addEventListener('click', () => {
+      if (poolActive) { poolActive = false; chaosBtn.textContent = "🎱 Let's Shoot Some Pool"; stopPool(); }
+      puzzleActive = !puzzleActive;
+      puzzleBtn.textContent = puzzleActive ? 'Stop Puzzle' : '🧩 Put It Together';
+      puzzleActive ? startPuzzle() : stopPuzzle(true);
+    });
+  }
+
+  function calcPuzzleGrid() {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const availW = Math.min(vw * 0.64, 600);
+    PIECE_W = Math.floor(availW / PUZZLE_COLS);
+    PIECE_H = Math.floor(PIECE_W * 0.64);
+    const gW = PUZZLE_COLS * PIECE_W, gH = PUZZLE_ROWS * PIECE_H;
+    pGridX = Math.floor((vw - gW) / 2);
+    pGridY = Math.floor(headerH + (vh - headerH - 72 - gH) / 2);
+  }
+
+  function startPuzzle() {
+    calcPuzzleGrid();
+    puzzleSolved = 0;
+
+    /* Ghost grid */
+    puzzleGhostEl = document.createElement('div');
+    puzzleGhostEl.className = 'puzzle-ghost';
+    for (let i = 0; i < 15; i++) {
+      const c = i % PUZZLE_COLS, r = Math.floor(i / PUZZLE_COLS);
+      const cell = document.createElement('div');
+      cell.className = 'puzzle-ghost-cell';
+      cell.id = 'pgc-' + i;
+      cell.style.cssText = `left:${pGridX + c * PIECE_W}px;top:${pGridY + r * PIECE_H}px;width:${PIECE_W}px;height:${PIECE_H}px;`;
+      puzzleGhostEl.appendChild(cell);
+    }
+    document.body.appendChild(puzzleGhostEl);
+    requestAnimationFrame(() => puzzleGhostEl.classList.add('active'));
+
+    /* Reference thumbnail */
+    const thumb = document.createElement('img');
+    thumb.src = PUZZLE_IMG;
+    thumb.className = 'puzzle-thumb';
+    thumb.id = 'puzzleThumb';
+    document.body.appendChild(thumb);
+
+    /* Hide excess blocks */
+    blocks.slice(15).forEach(b => { b.style.transition = 'opacity .25s'; b.style.opacity = '0'; b.style.pointerEvents = 'none'; });
+
+    /* Setup pieces */
+    const vw = window.innerWidth, vh = window.innerHeight;
+    blocks.slice(0, 15).forEach((bl, i) => {
+      const col = i % PUZZLE_COLS, row = Math.floor(i / PUZZLE_COLS);
+      bl.classList.add('puzzle-piece');
+      bl.style.width  = PIECE_W + 'px';
+      bl.style.height = PIECE_H + 'px';
+      bl.style.backgroundImage    = `url('${PUZZLE_IMG}')`;
+      bl.style.backgroundSize     = `${PUZZLE_COLS * PIECE_W}px ${PUZZLE_ROWS * PIECE_H}px`;
+      bl.style.backgroundPosition = `-${col * PIECE_W}px -${row * PIECE_H}px`;
+      bl._puzzleIdx    = i;
+      bl._puzzleSolved = false;
+
+      /* Scatter to random position away from ghost grid */
+      let sx, sy, tries = 0;
+      do {
+        const m = 20;
+        sx = m + Math.random() * Math.max(0, vw - PIECE_W - m * 2);
+        sy = headerH + m + Math.random() * Math.max(0, vh - headerH - PIECE_H - 80);
+        tries++;
+      } while (
+        tries < 20 &&
+        sx + PIECE_W > pGridX - 20 && sx < pGridX + PUZZLE_COLS * PIECE_W + 20 &&
+        sy + PIECE_H > pGridY - 20 && sy < pGridY + PUZZLE_ROWS * PIECE_H + 20
+      );
+
+      const delay = i * 45;
+      bl.style.transition = `left .45s ${delay}ms cubic-bezier(.16,1,.3,1),top .45s ${delay}ms cubic-bezier(.16,1,.3,1),transform .45s ${delay}ms cubic-bezier(.16,1,.3,1)`;
+      bl.style.left      = sx + 'px';
+      bl.style.top       = sy + 'px';
+      bl.style.transform = `rotate(${(Math.random() - 0.5) * 14}deg)`;
+      bl.style.opacity   = '1';
+      bl.style.zIndex    = String(10 + i);
+      setTimeout(() => { bl.style.transition = ''; }, 460 + delay);
+
+      bl.addEventListener('mousedown',  onPieceDown);
+      bl.addEventListener('touchstart', onPieceDown, { passive: false });
+    });
+
+    showPuzzleTip();
+  }
+
+  function stopPuzzle(doScatter) {
+    puzzleActive = false;
+    if (puzzleGhostEl) { puzzleGhostEl.remove(); puzzleGhostEl = null; }
+    const thumb = document.getElementById('puzzleThumb');
+    if (thumb) thumb.remove();
+
+    blocks.slice(0, 15).forEach(bl => {
+      bl.classList.remove('puzzle-piece', 'pz-solved');
+      bl.removeEventListener('mousedown',  onPieceDown);
+      bl.removeEventListener('touchstart', onPieceDown);
+      bl.style.backgroundImage    = '';
+      bl.style.backgroundSize     = '';
+      bl.style.backgroundPosition = '';
+      bl._puzzleSolved = false;
+      const img = bl.querySelector('img');
+      if (img) img.style.opacity = '';
+    });
+    blocks.slice(15).forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = ''; });
+
+    if (doScatter) {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      blocks.forEach(bl => {
+        const bw = parseInt(bl._origWidth)  || bl.offsetWidth;
+        const bh = parseInt(bl._origHeight) || bl.offsetHeight;
+        bl.style.width  = bl._origWidth  || '';
+        bl.style.height = bl._origHeight || '';
+        const m = 24, rot = (Math.random() - 0.5) * 24;
+        bl._rot = rot;
+        const x = m + Math.random() * Math.max(0, vw - bw - m * 2);
+        const y = headerH + m + Math.random() * Math.max(0, vh - headerH - bh - m * 2);
+        bl.style.transition = 'left .55s cubic-bezier(.16,1,.3,1),top .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)';
+        bl.style.left      = x + 'px';
+        bl.style.top       = y + 'px';
+        bl.style.transform = `rotate(${rot}deg)`;
+        setTimeout(() => { bl.style.transition = ''; }, 620);
+      });
+    }
+  }
+
+  /* Puzzle drag */
+  function onPieceDown(e) {
+    if (!puzzleActive) return;
+    const bl = e.currentTarget;
+    if (bl._puzzleSolved) return;
+    e.preventDefault(); e.stopPropagation();
+    const { x, y } = getXY(e);
+    pzPiece = bl; pzMx0 = x; pzMy0 = y;
+    pzLeft0 = parseFloat(bl.style.left) || 0;
+    pzTop0  = parseFloat(bl.style.top)  || 0;
+    bl.style.zIndex    = String(++topZ);
+    bl.style.transform = 'scale(1.06) rotate(0deg)';
+    playPickup();
+    window.addEventListener('mousemove', onPieceMove);
+    window.addEventListener('mouseup',   onPieceUp);
+    window.addEventListener('touchmove', onPieceMove, { passive: false });
+    window.addEventListener('touchend',  onPieceUp);
+  }
+
+  function onPieceMove(e) {
+    if (!pzPiece) return;
+    e.preventDefault();
+    const { x, y } = getXY(e);
+    pzPiece.style.left = (pzLeft0 + x - pzMx0) + 'px';
+    pzPiece.style.top  = (pzTop0  + y - pzMy0) + 'px';
+  }
+
+  function onPieceUp() {
+    if (!pzPiece) return;
+    const bl = pzPiece;
+    pzPiece = null;
+    window.removeEventListener('mousemove', onPieceMove);
+    window.removeEventListener('mouseup',   onPieceUp);
+    window.removeEventListener('touchmove', onPieceMove);
+    window.removeEventListener('touchend',  onPieceUp);
+
+    const idx  = bl._puzzleIdx;
+    const col  = idx % PUZZLE_COLS, row = Math.floor(idx / PUZZLE_COLS);
+    const tx   = pGridX + col * PIECE_W, ty = pGridY + row * PIECE_H;
+    const cx   = parseFloat(bl.style.left) + PIECE_W / 2;
+    const cy   = parseFloat(bl.style.top)  + PIECE_H / 2;
+    const dist = Math.hypot(cx - (tx + PIECE_W / 2), cy - (ty + PIECE_H / 2));
+
+    if (dist < SNAP_DIST) {
+      bl.style.transition = 'left .16s ease-out,top .16s ease-out,transform .16s ease-out';
+      bl.style.left      = tx + 'px';
+      bl.style.top       = ty + 'px';
+      bl.style.transform = 'none';
+      bl.style.zIndex    = '6';
+      bl._puzzleSolved   = true;
+      bl.classList.add('pz-solved');
+      setTimeout(() => { bl.style.transition = ''; }, 180);
+      const cell = document.getElementById('pgc-' + idx);
+      if (cell) cell.classList.add('filled');
+      playDrop();
+      if (++puzzleSolved === 15) onPuzzleWin();
+    } else {
+      bl.style.transform = `rotate(${(Math.random() - 0.5) * 10}deg)`;
+    }
+  }
+
+  function onPuzzleWin() {
+    [330, 440, 550, 660, 880].forEach((f, i) =>
+      setTimeout(() => playTone(f, f * 1.05, 0.2, 0.18), i * 110)
+    );
+    const msg = document.createElement('div');
+    msg.className = 'chaos-hint';
+    msg.textContent = 'Nice work! 🎉';
+    document.body.appendChild(msg);
+    setTimeout(() => {
+      msg.style.opacity = '0';
+      setTimeout(() => msg.remove(), 700);
+      puzzleBtn.textContent = '🧩 Put It Together';
+      stopPuzzle(true);
+    }, 2400);
+  }
+
+  function showPuzzleTip() {
+    if (chaosTip) chaosTip.remove();
+    chaosTip = document.createElement('div');
+    chaosTip.className = 'chaos-hint';
+    chaosTip.innerHTML = 'Drag pieces to rebuild the image<span>Drop near the correct spot to snap &middot; Click to dismiss</span>';
+    document.body.appendChild(chaosTip);
+    setTimeout(() => { document.addEventListener('click', dismissTip, { once: true }); }, 500);
   }
 
 })();
