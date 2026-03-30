@@ -589,14 +589,25 @@
   }
 
   /* ═══════════════════════════════════════════
-     PUZZLE MODE
+     PUZZLE MODE — image-by-image progression
   ═══════════════════════════════════════════ */
-  const PUZZLE_COLS = 3;
-  const PUZZLE_ROWS = 5;
-  const PUZZLE_IMG  = 'images/playground/01-tap-hero.webp';
-  const SNAP_DIST   = 52;
+  const PUZZLE_COLS  = 3;
+  const PUZZLE_ROWS  = 3;
+  const PUZZLE_N     = 9;
+  const PUZZLE_TOTAL = 6;
+  const SNAP_DIST    = 52;
+  const SESSION_KEY  = 'pgPuzzleProgress';
+  const PUZZLE_IMAGES = [
+    'images/playground/01-tap-hero.webp',
+    'images/playground/02-tap-bento.webp',
+    'images/playground/03-humnet.webp',
+    'images/playground/04-LWP-6.webp',
+    'images/playground/05-upliasection.webp',
+    'images/playground/06-ASF-section.webp',
+  ];
 
   let puzzleSolved  = 0;
+  let puzzleImgIdx  = 0;
   let puzzleGhostEl = null;
   let PIECE_W = 0, PIECE_H = 0, pGridX = 0, pGridY = 0;
   let pzPiece = null, pzMx0 = 0, pzMy0 = 0, pzLeft0 = 0, pzTop0 = 0;
@@ -611,24 +622,41 @@
     });
   }
 
+  function getPuzzleProgress() {
+    try { return Math.min(parseInt(sessionStorage.getItem(SESSION_KEY) || '0', 10), PUZZLE_TOTAL); }
+    catch(e) { return 0; }
+  }
+  function setPuzzleProgress(n) {
+    try { sessionStorage.setItem(SESSION_KEY, String(n)); } catch(e) {}
+  }
+
   function calcPuzzleGrid() {
     const vw = window.innerWidth, vh = window.innerHeight;
-    const availW = Math.min(vw * 0.64, 600);
+    const availW = Math.min(vw * 0.68, 540);
     PIECE_W = Math.floor(availW / PUZZLE_COLS);
-    PIECE_H = Math.floor(PIECE_W * 0.64);
+    PIECE_H = Math.floor(PIECE_W * 0.66);
     const gW = PUZZLE_COLS * PIECE_W, gH = PUZZLE_ROWS * PIECE_H;
     pGridX = Math.floor((vw - gW) / 2);
-    pGridY = Math.floor(headerH + (vh - headerH - 72 - gH) / 2);
+    pGridY = Math.floor(headerH + (vh - headerH - 80 - gH) / 2);
   }
 
   function startPuzzle() {
+    let saved = getPuzzleProgress();
+    if (saved >= PUZZLE_TOTAL) { saved = 0; setPuzzleProgress(0); }
+    puzzleImgIdx = saved;
+    createProgressBar();
+    loadPuzzleImage(puzzleImgIdx);
+  }
+
+  function loadPuzzleImage(idx) {
     calcPuzzleGrid();
     puzzleSolved = 0;
+    const imgSrc = PUZZLE_IMAGES[idx];
 
-    /* Ghost grid */
+    if (puzzleGhostEl) { puzzleGhostEl.remove(); puzzleGhostEl = null; }
     puzzleGhostEl = document.createElement('div');
     puzzleGhostEl.className = 'puzzle-ghost';
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < PUZZLE_N; i++) {
       const c = i % PUZZLE_COLS, r = Math.floor(i / PUZZLE_COLS);
       const cell = document.createElement('div');
       cell.className = 'puzzle-ghost-cell';
@@ -639,30 +667,35 @@
     document.body.appendChild(puzzleGhostEl);
     requestAnimationFrame(() => puzzleGhostEl.classList.add('active'));
 
-    /* Reference thumbnail */
+    document.getElementById('puzzleThumb')?.remove();
     const thumb = document.createElement('img');
-    thumb.src = PUZZLE_IMG;
+    thumb.src = imgSrc;
     thumb.className = 'puzzle-thumb';
     thumb.id = 'puzzleThumb';
     document.body.appendChild(thumb);
 
-    /* Hide excess blocks */
-    blocks.slice(15).forEach(b => { b.style.transition = 'opacity .25s'; b.style.opacity = '0'; b.style.pointerEvents = 'none'; });
+    blocks.slice(PUZZLE_N).forEach(b => {
+      b.style.transition = 'opacity .2s';
+      b.style.opacity = '0';
+      b.style.pointerEvents = 'none';
+    });
 
-    /* Setup pieces */
     const vw = window.innerWidth, vh = window.innerHeight;
-    blocks.slice(0, 15).forEach((bl, i) => {
+    blocks.slice(0, PUZZLE_N).forEach((bl, i) => {
+      bl.removeEventListener('mousedown',  onPieceDown);
+      bl.removeEventListener('touchstart', onPieceDown);
+      bl.classList.remove('pz-solved');
+
       const col = i % PUZZLE_COLS, row = Math.floor(i / PUZZLE_COLS);
       bl.classList.add('puzzle-piece');
       bl.style.width  = PIECE_W + 'px';
       bl.style.height = PIECE_H + 'px';
-      bl.style.backgroundImage    = `url('${PUZZLE_IMG}')`;
+      bl.style.backgroundImage    = `url('${imgSrc}')`;
       bl.style.backgroundSize     = `${PUZZLE_COLS * PIECE_W}px ${PUZZLE_ROWS * PIECE_H}px`;
       bl.style.backgroundPosition = `-${col * PIECE_W}px -${row * PIECE_H}px`;
       bl._puzzleIdx    = i;
       bl._puzzleSolved = false;
 
-      /* Scatter to random position away from ghost grid */
       let sx, sy, tries = 0;
       do {
         const m = 20;
@@ -670,34 +703,54 @@
         sy = headerH + m + Math.random() * Math.max(0, vh - headerH - PIECE_H - 80);
         tries++;
       } while (
-        tries < 20 &&
+        tries < 25 &&
         sx + PIECE_W > pGridX - 20 && sx < pGridX + PUZZLE_COLS * PIECE_W + 20 &&
         sy + PIECE_H > pGridY - 20 && sy < pGridY + PUZZLE_ROWS * PIECE_H + 20
       );
 
-      const delay = i * 45;
+      const delay = i * 55;
+      bl.style.opacity   = '1';
+      bl.style.zIndex    = String(10 + i);
       bl.style.transition = `left .45s ${delay}ms cubic-bezier(.16,1,.3,1),top .45s ${delay}ms cubic-bezier(.16,1,.3,1),transform .45s ${delay}ms cubic-bezier(.16,1,.3,1)`;
       bl.style.left      = sx + 'px';
       bl.style.top       = sy + 'px';
-      bl.style.transform = `rotate(${(Math.random() - 0.5) * 14}deg)`;
-      bl.style.opacity   = '1';
-      bl.style.zIndex    = String(10 + i);
+      bl.style.transform = `rotate(${(Math.random() - 0.5) * 16}deg)`;
       setTimeout(() => { bl.style.transition = ''; }, 460 + delay);
 
       bl.addEventListener('mousedown',  onPieceDown);
       bl.addEventListener('touchstart', onPieceDown, { passive: false });
     });
 
+    updateProgressBar();
     showPuzzleTip();
+  }
+
+  function createProgressBar() {
+    document.getElementById('puzzleBar')?.remove();
+    const bar = document.createElement('div');
+    bar.id = 'puzzleBar';
+    bar.className = 'puzzle-progress-bar';
+    bar.innerHTML = '<div class="pzb-track"><div class="pzb-fill" id="pzbFill"></div></div><span class="pzb-label" id="pzbLabel"></span>';
+    document.body.appendChild(bar);
+    updateProgressBar();
+  }
+
+  function updateProgressBar() {
+    const fill  = document.getElementById('pzbFill');
+    const label = document.getElementById('pzbLabel');
+    if (!fill || !label) return;
+    const done = getPuzzleProgress();
+    fill.style.width  = (done / PUZZLE_TOTAL * 100) + '%';
+    label.textContent = done + ' / ' + PUZZLE_TOTAL;
   }
 
   function stopPuzzle(doScatter) {
     puzzleActive = false;
     if (puzzleGhostEl) { puzzleGhostEl.remove(); puzzleGhostEl = null; }
-    const thumb = document.getElementById('puzzleThumb');
-    if (thumb) thumb.remove();
+    document.getElementById('puzzleThumb')?.remove();
+    document.getElementById('puzzleBar')?.remove();
 
-    blocks.slice(0, 15).forEach(bl => {
+    blocks.slice(0, PUZZLE_N).forEach(bl => {
       bl.classList.remove('puzzle-piece', 'pz-solved');
       bl.removeEventListener('mousedown',  onPieceDown);
       bl.removeEventListener('touchstart', onPieceDown);
@@ -708,15 +761,14 @@
       const img = bl.querySelector('img');
       if (img) img.style.opacity = '';
     });
-    blocks.slice(15).forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = ''; });
+    blocks.slice(PUZZLE_N).forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = ''; });
 
     if (doScatter) {
       const vw = window.innerWidth, vh = window.innerHeight;
       blocks.forEach(bl => {
-        const bw = parseInt(bl._origWidth)  || bl.offsetWidth;
-        const bh = parseInt(bl._origHeight) || bl.offsetHeight;
         bl.style.width  = bl._origWidth  || '';
         bl.style.height = bl._origHeight || '';
+        const bw = bl.offsetWidth, bh = bl.offsetHeight;
         const m = 24, rot = (Math.random() - 0.5) * 24;
         bl._rot = rot;
         const x = m + Math.random() * Math.max(0, vw - bw - m * 2);
@@ -730,7 +782,6 @@
     }
   }
 
-  /* Puzzle drag */
   function onPieceDown(e) {
     if (!puzzleActive) return;
     const bl = e.currentTarget;
@@ -785,35 +836,67 @@
       const cell = document.getElementById('pgc-' + idx);
       if (cell) cell.classList.add('filled');
       playDrop();
-      if (++puzzleSolved === 15) onPuzzleWin();
+      if (++puzzleSolved === PUZZLE_N) onImageComplete();
     } else {
       bl.style.transform = `rotate(${(Math.random() - 0.5) * 10}deg)`;
     }
   }
 
-  function onPuzzleWin() {
+  function onImageComplete() {
     [330, 440, 550, 660, 880].forEach((f, i) =>
-      setTimeout(() => playTone(f, f * 1.05, 0.2, 0.18), i * 110)
+      setTimeout(() => playTone(f, f * 1.05, 0.22, 0.18), i * 100)
     );
-    const msg = document.createElement('div');
-    msg.className = 'chaos-hint';
-    msg.textContent = 'Nice work! 🎉';
-    document.body.appendChild(msg);
-    setTimeout(() => {
-      msg.style.opacity = '0';
-      setTimeout(() => msg.remove(), 700);
-      puzzleBtn.textContent = '🧩 Put It Together';
-      stopPuzzle(true);
-    }, 2400);
+    const newDone = puzzleImgIdx + 1;
+    setPuzzleProgress(newDone);
+    updateProgressBar();
+
+    if (newDone >= PUZZLE_TOTAL) {
+      const msg = document.createElement('div');
+      msg.className = 'chaos-hint';
+      msg.textContent = 'All done! 🏆';
+      document.body.appendChild(msg);
+      setTimeout(() => {
+        msg.style.opacity = '0';
+        setTimeout(() => msg.remove(), 700);
+        puzzleBtn.textContent = '🧩 Put It Together';
+        stopPuzzle(true);
+      }, 2800);
+    } else {
+      const msg = document.createElement('div');
+      msg.className = 'chaos-hint';
+      msg.textContent = newDone + ' / ' + PUZZLE_TOTAL + ' ✓';
+      document.body.appendChild(msg);
+      setTimeout(() => { msg.style.opacity = '0'; setTimeout(() => msg.remove(), 600); }, 1300);
+
+      setTimeout(() => {
+        puzzleImgIdx = newDone;
+        blocks.slice(0, PUZZLE_N).forEach((bl, i) => {
+          bl.removeEventListener('mousedown',  onPieceDown);
+          bl.removeEventListener('touchstart', onPieceDown);
+          const d = i * 35;
+          bl.style.transition = `transform .3s ${d}ms ease-in, opacity .28s ${d}ms ease-in`;
+          bl.style.transform = 'scale(0) rotate(200deg)';
+          bl.style.opacity   = '0';
+          setTimeout(() => { bl.style.transition = ''; }, 340 + d);
+        });
+        setTimeout(() => loadPuzzleImage(puzzleImgIdx), 520);
+      }, 1700);
+    }
   }
 
   function showPuzzleTip() {
     if (chaosTip) chaosTip.remove();
     chaosTip = document.createElement('div');
     chaosTip.className = 'chaos-hint';
-    chaosTip.innerHTML = 'Drag pieces to rebuild the image<span>Drop near the correct spot to snap &middot; Click to dismiss</span>';
+    chaosTip.innerHTML = `Image ${puzzleImgIdx + 1} of ${PUZZLE_TOTAL} — drag pieces to rebuild<span>Drop near the correct spot to snap &middot; Click to dismiss</span>`;
     document.body.appendChild(chaosTip);
     setTimeout(() => { document.addEventListener('click', dismissTip, { once: true }); }, 500);
+  }
+
+  function dismissTip() {
+    if (!chaosTip) return;
+    chaosTip.style.opacity = '0';
+    setTimeout(() => { if (chaosTip) { chaosTip.remove(); chaosTip = null; } }, 850);
   }
 
 })();
