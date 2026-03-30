@@ -293,9 +293,30 @@
         position: static;
       }
     }
+
+    /* ── Scroll progress bar ── */
+    .sp-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+    .sp-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green, #c7d59f);
+      transition: width 60ms linear;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Scroll progress -->
+  <div class="sp-progress"><div class="sp-progress-fill" id="spProgressFill"></div></div>
 
   <!-- HEADER -->
   <header class="header">
@@ -335,7 +356,7 @@
         <!-- Identity -->
         <div class="sp-project-identity">
           <div class="sp-icon">
-            <img src="https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6" alt="Hooker Furniture logo" />
+            <img src="images/icons/avatar-hooker.svg" alt="Hooker Furniture logo" />
           </div>
           <span class="sp-project-name">Hooker Furniture</span>
         </div>
@@ -350,19 +371,7 @@
 
           <div class="sp-meta-row">
             <dt class="sp-meta-label">What I Did</dt>
-            <dd class="sp-meta-value">Led UX/UI design end-to-end — research, wireframes, visual design, and dev handoff. Owned the design system and component library throughout.</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Tools</dt>
-            <dd class="sp-meta-value">Figma</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Team</dt>
-            <dd class="sp-meta-value">
-              <a href="https://www.linkedin.com/in/marija-radulovic/" class="sp-collab-link" target="_blank" rel="noopener">Marija Radulovic</a>
-            </dd>
+            <dd class="sp-meta-value">Led UX/UI design end-to-end with <a href="https://www.linkedin.com/in/marija-radulovic/" class="sp-collab-link" target="_blank" rel="noopener">Marija Radulovic</a> — research, wireframes, visual design, and dev handoff.</dd>
           </div>
 
           <div class="sp-meta-row">
@@ -404,6 +413,18 @@
 
         <div class="sp-img-card sp-reveal">
           <img src="https://picsum.photos/seed/hooker-04/1200/720" alt="Hooker Furniture — Mobile view" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/hooker-05/1200/720" alt="Hooker Furniture — Navigation" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/hooker-06/1200/800" alt="Hooker Furniture — Components" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/hooker-07/1200/720" alt="Hooker Furniture — Checkout" />
         </div>
 
       </div>
@@ -458,6 +479,18 @@
         menuToggle.setAttribute('aria-expanded', open);
       });
     }
+
+    /* ── Scroll progress bar ── */
+    const progressFill = document.getElementById('spProgressFill');
+    const imagesCol    = document.querySelector('.sp-images');
+    function updateProgress() {
+      const start = imagesCol.offsetTop;
+      const end   = imagesCol.offsetTop + imagesCol.offsetHeight - window.innerHeight;
+      const pct   = Math.max(0, Math.min(100, (window.scrollY - start) / (end - start) * 100));
+      progressFill.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
 
     /* ── Scroll reveal ── */
     const revealEls = document.querySelectorAll('.sp-reveal');

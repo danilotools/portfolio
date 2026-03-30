@@ -270,9 +270,30 @@
       .sp-grid { grid-template-columns: 1fr; gap: 48px; }
       .sp-sidebar { position: static; }
     }
+
+    /* ── Scroll progress bar ── */
+    .sp-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+    .sp-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green, #c7d59f);
+      transition: width 60ms linear;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Scroll progress -->
+  <div class="sp-progress"><div class="sp-progress-fill" id="spProgressFill"></div></div>
 
   <header class="header">
     <nav class="nav" aria-label="Primary navigation">
@@ -309,7 +330,7 @@
 
         <div class="sp-project-identity">
           <div class="sp-icon">
-            <img src="https://www.figma.com/api/mcp/asset/6e5bbd7c-7f70-4e46-ab62-8fdab9bc2001" alt="Laurel Wealth Planning logo" />
+            <img src="images/icons/avatar-lwp.png" alt="Laurel Wealth Planning logo" />
           </div>
           <span class="sp-project-name">Laurel Wealth Planning</span>
         </div>
@@ -322,19 +343,7 @@
 
           <div class="sp-meta-row">
             <dt class="sp-meta-label">What I Did</dt>
-            <dd class="sp-meta-value">UX strategy, visual design, and Webflow development. Full ownership from brand audit to live site — including copywriting and responsive behaviour.</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Tools</dt>
-            <dd class="sp-meta-value">Figma, Webflow</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Team</dt>
-            <dd class="sp-meta-value">
-              <a href="https://www.linkedin.com/in/jovana-culibrk/" class="sp-collab-link" target="_blank" rel="noopener">Jovana Culibrk</a>
-            </dd>
+            <dd class="sp-meta-value">UX strategy, visual design, and Webflow development with <a href="https://www.linkedin.com/in/jovana-culibrk/" class="sp-collab-link" target="_blank" rel="noopener">Jovana Culibrk</a> — full ownership from brand audit to live site.</dd>
           </div>
 
           <div class="sp-meta-row">
@@ -376,6 +385,18 @@
 
         <div class="sp-img-card sp-reveal">
           <img src="https://picsum.photos/seed/lwp-04/1200/720" alt="Laurel Wealth Planning — Contact" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/lwp-05/1200/720" alt="Laurel Wealth Planning — Team" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/lwp-06/1200/800" alt="Laurel Wealth Planning — Mobile" />
+        </div>
+
+        <div class="sp-img-card sp-reveal">
+          <img src="https://picsum.photos/seed/lwp-07/1200/720" alt="Laurel Wealth Planning — Footer" />
         </div>
 
       </div>
@@ -431,6 +452,18 @@
         menuToggle.setAttribute('aria-expanded', open);
       });
     }
+
+    /* ── Scroll progress bar ── */
+    const progressFill = document.getElementById('spProgressFill');
+    const imagesCol    = document.querySelector('.sp-images');
+    function updateProgress() {
+      const start = imagesCol.offsetTop;
+      const end   = imagesCol.offsetTop + imagesCol.offsetHeight - window.innerHeight;
+      const pct   = Math.max(0, Math.min(100, (window.scrollY - start) / (end - start) * 100));
+      progressFill.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
 
     const revealEls = document.querySelectorAll('.sp-reveal');
     const obs = new IntersectionObserver((entries) => {
