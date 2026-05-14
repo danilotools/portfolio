@@ -7,7 +7,7 @@ const PROJECTS = [
     desc: 'Elevating home living through timeless, bold design',
     image: 'images/hooker-furniture/1.webp',
     iconType: 'frame',
-    iconSrc: 'https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6',
+    iconSrc: 'images/icons/avatar-hooker.svg',
     link: 'project-hooker.html',
   },
   {
@@ -15,7 +15,7 @@ const PROJECTS = [
     desc: 'Redesigning the whole website from the ground up',
     image: 'https://picsum.photos/seed/laurel202/1200/674',
     iconType: 'laurel',
-    iconSrc: 'https://www.figma.com/api/mcp/asset/6e5bbd7c-7f70-4e46-ab62-8fdab9bc2001',
+    iconSrc: 'images/icons/avatar-lwp.png',
     link: 'project-lwp.html',
   },
   {
@@ -23,7 +23,7 @@ const PROJECTS = [
     desc: 'Building tools for the future of creative work',
     image: 'https://picsum.photos/seed/supercluster303/1200/674',
     iconType: 'sc',
-    iconSrc: 'https://www.figma.com/api/mcp/asset/8ce9105c-1697-456e-a8ab-79893b0df028',
+    iconSrc: 'images/icons/avatar-supercluster.png',
     link: 'project-supercluster.html',
   },
 ];
