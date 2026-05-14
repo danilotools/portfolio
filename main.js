@@ -5,7 +5,7 @@ const PROJECTS = [
   {
     name: 'Hooker Furniture',
     desc: 'Elevating home living through timeless, bold design',
-    image: 'https://picsum.photos/seed/hooker101/1200/674',
+    image: 'images/hooker-furniture/1.webp',
     iconType: 'frame',
     iconSrc: 'https://www.figma.com/api/mcp/asset/4b7d0ec7-4a7d-45bc-a7de-c03e9b9649d6',
     link: 'project-hooker.html',
