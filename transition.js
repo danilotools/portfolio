@@ -1,3 +1,22 @@
+/* ── Smooth scroll (Lenis) ──────────────────────────────────────── */
+(function () {
+  if (document.body.classList.contains('playground-page')) return;
+
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/lenis@1.1.14/dist/lenis.min.js';
+  s.onload = function () {
+    const lenis = new Lenis({
+      lerp: 0.1,
+      smoothWheel: true,
+      syncTouch: false,
+    });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+    window.__lenis = lenis;
+  };
+  document.head.appendChild(s);
+})();
+
 /* ── Mobile menu toggle ──────────────────────────────────────────── */
 (function () {
   const toggle = document.getElementById('menuToggle');
