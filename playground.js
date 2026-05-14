@@ -64,6 +64,8 @@
   let active = null, startMx = 0, startMy = 0, startLeft = 0, startTop = 0;
   let lastX = 0, lastY = 0, velX = 0, velY = 0, didDrag = false, topZ = 10;
   let poolActive   = false;
+  let puzzleActive = false;
+  let quizActive   = false;
   const DRAG_SCALE = isMobile ? 1.35 : 1.8;
   const throwRAFs  = new WeakMap();
 
@@ -78,7 +80,7 @@
   }
 
   function onDown(e) {
-    if (poolActive) return;
+    if (poolActive || puzzleActive || quizActive) return;
     if (e.button && e.button !== 0) return;
     e.preventDefault();
     const raf = throwRAFs.get(e.currentTarget);
@@ -168,6 +170,11 @@
   const chaosBorderEl = document.getElementById('chaosBorder');
   const chaosBtn      = document.getElementById('scatterBtn');
 
+  function setBtnText(btn, text) {
+    const s = btn && btn.querySelector('.btn-text');
+    if (s) s.textContent = text; else if (btn) btn.textContent = text;
+  }
+
   let physBalls   = [];                    /* array of physics objects */
   let physRunning = false, physRaf = null;
   let aliveBlocks = new Set();
@@ -194,7 +201,7 @@
   if (chaosBtn) {
     chaosBtn.addEventListener('click', () => {
       poolActive = !poolActive;
-      chaosBtn.textContent = poolActive ? 'Stop the game' : "🎱 Let's Shoot Some Pool";
+      setBtnText(chaosBtn, poolActive ? 'Stop the game' : "Let's Shoot Some Pool");
       poolActive ? startPool() : stopPool();
     });
   }
@@ -587,5 +594,475 @@
     setTimeout(() => { if (chaosTip) { chaosTip.remove(); chaosTip = null; } }, 850);
   }
 
+  /* ═══════════════════════════════════════════
+     PUZZLE MODE — image-by-image progression
+  ═══════════════════════════════════════════ */
+  const PUZZLE_COLS  = 3;
+  const PUZZLE_ROWS  = 3;
+  const PUZZLE_N     = 9;
+  const PUZZLE_TOTAL = 6;
+  const SNAP_DIST    = 52;
+  const SESSION_KEY  = 'pgPuzzleProgress';
+  const PUZZLE_IMAGES = [
+    'images/playground/01-tap-hero.webp',
+    'images/playground/02-tap-bento.webp',
+    'images/playground/03-humnet.webp',
+    'images/playground/04-LWP-6.webp',
+    'images/playground/05-upliasection.webp',
+    'images/playground/06-ASF-section.webp',
+  ];
+
+  let puzzleSolved  = 0;
+  let puzzleImgIdx  = 0;
+  let puzzleGhostEl = null;
+  let PIECE_W = 0, PIECE_H = 0, pGridX = 0, pGridY = 0;
+  let pzPiece = null, pzMx0 = 0, pzMy0 = 0, pzLeft0 = 0, pzTop0 = 0;
+
+  const puzzleBtn = document.getElementById('puzzleBtn');
+  if (puzzleBtn) {
+    puzzleBtn.addEventListener('click', () => {
+      if (poolActive) { poolActive = false; setBtnText(chaosBtn, "Let's Shoot Some Pool"); stopPool(); }
+      puzzleActive = !puzzleActive;
+      setBtnText(puzzleBtn, puzzleActive ? 'Stop Puzzle' : 'Put It Together');
+      puzzleActive ? startPuzzle() : stopPuzzle(true);
+    });
+  }
+
+  function getPuzzleProgress() {
+    try { return Math.min(parseInt(sessionStorage.getItem(SESSION_KEY) || '0', 10), PUZZLE_TOTAL); }
+    catch(e) { return 0; }
+  }
+  function setPuzzleProgress(n) {
+    try { sessionStorage.setItem(SESSION_KEY, String(n)); } catch(e) {}
+  }
+
+  function calcPuzzleGrid() {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const availW = Math.min(vw * 0.68, 540);
+    PIECE_W = Math.floor(availW / PUZZLE_COLS);
+    PIECE_H = Math.floor(PIECE_W * 0.66);
+    const gW = PUZZLE_COLS * PIECE_W, gH = PUZZLE_ROWS * PIECE_H;
+    pGridX = Math.floor((vw - gW) / 2);
+    pGridY = Math.floor(headerH + (vh - headerH - 80 - gH) / 2);
+  }
+
+  function startPuzzle() {
+    let saved = getPuzzleProgress();
+    if (saved >= PUZZLE_TOTAL) { saved = 0; setPuzzleProgress(0); }
+    puzzleImgIdx = saved;
+    createProgressBar();
+    loadPuzzleImage(puzzleImgIdx);
+  }
+
+  function loadPuzzleImage(idx) {
+    calcPuzzleGrid();
+    puzzleSolved = 0;
+    const imgSrc = PUZZLE_IMAGES[idx];
+
+    if (puzzleGhostEl) { puzzleGhostEl.remove(); puzzleGhostEl = null; }
+    puzzleGhostEl = document.createElement('div');
+    puzzleGhostEl.className = 'puzzle-ghost';
+    for (let i = 0; i < PUZZLE_N; i++) {
+      const c = i % PUZZLE_COLS, r = Math.floor(i / PUZZLE_COLS);
+      const cell = document.createElement('div');
+      cell.className = 'puzzle-ghost-cell';
+      cell.id = 'pgc-' + i;
+      cell.style.cssText = `left:${pGridX + c * PIECE_W}px;top:${pGridY + r * PIECE_H}px;width:${PIECE_W}px;height:${PIECE_H}px;`;
+      puzzleGhostEl.appendChild(cell);
+    }
+    document.body.appendChild(puzzleGhostEl);
+    requestAnimationFrame(() => puzzleGhostEl.classList.add('active'));
+
+    document.getElementById('puzzleThumb')?.remove();
+    const thumb = document.createElement('img');
+    thumb.src = imgSrc;
+    thumb.className = 'puzzle-thumb';
+    thumb.id = 'puzzleThumb';
+    document.body.appendChild(thumb);
+
+    blocks.slice(PUZZLE_N).forEach(b => {
+      b.style.transition = 'opacity .2s';
+      b.style.opacity = '0';
+      b.style.pointerEvents = 'none';
+    });
+
+    const vw = window.innerWidth, vh = window.innerHeight;
+    blocks.slice(0, PUZZLE_N).forEach((bl, i) => {
+      bl.removeEventListener('mousedown',  onPieceDown);
+      bl.removeEventListener('touchstart', onPieceDown);
+      bl.classList.remove('pz-solved');
+
+      const col = i % PUZZLE_COLS, row = Math.floor(i / PUZZLE_COLS);
+      bl.classList.add('puzzle-piece');
+      bl.style.width  = PIECE_W + 'px';
+      bl.style.height = PIECE_H + 'px';
+      bl.style.backgroundImage    = `url('${imgSrc}')`;
+      bl.style.backgroundSize     = `${PUZZLE_COLS * PIECE_W}px ${PUZZLE_ROWS * PIECE_H}px`;
+      bl.style.backgroundPosition = `-${col * PIECE_W}px -${row * PIECE_H}px`;
+      bl._puzzleIdx    = i;
+      bl._puzzleSolved = false;
+
+      let sx, sy, tries = 0;
+      do {
+        const m = 20;
+        sx = m + Math.random() * Math.max(0, vw - PIECE_W - m * 2);
+        sy = headerH + m + Math.random() * Math.max(0, vh - headerH - PIECE_H - 80);
+        tries++;
+      } while (
+        tries < 25 &&
+        sx + PIECE_W > pGridX - 20 && sx < pGridX + PUZZLE_COLS * PIECE_W + 20 &&
+        sy + PIECE_H > pGridY - 20 && sy < pGridY + PUZZLE_ROWS * PIECE_H + 20
+      );
+
+      const delay = i * 55;
+      bl.style.opacity   = '1';
+      bl.style.zIndex    = String(10 + i);
+      bl.style.transition = `left .45s ${delay}ms cubic-bezier(.16,1,.3,1),top .45s ${delay}ms cubic-bezier(.16,1,.3,1),transform .45s ${delay}ms cubic-bezier(.16,1,.3,1)`;
+      bl.style.left      = sx + 'px';
+      bl.style.top       = sy + 'px';
+      bl.style.transform = `rotate(${(Math.random() - 0.5) * 16}deg)`;
+      setTimeout(() => { bl.style.transition = ''; }, 460 + delay);
+
+      bl.addEventListener('mousedown',  onPieceDown);
+      bl.addEventListener('touchstart', onPieceDown, { passive: false });
+    });
+
+    updateProgressBar();
+    showPuzzleTip();
+  }
+
+  function createProgressBar() {
+    document.getElementById('puzzleBar')?.remove();
+    const bar = document.createElement('div');
+    bar.id = 'puzzleBar';
+    bar.className = 'puzzle-progress-bar';
+    bar.innerHTML = '<div class="pzb-track"><div class="pzb-fill" id="pzbFill"></div></div><span class="pzb-label" id="pzbLabel"></span>';
+    document.body.appendChild(bar);
+    updateProgressBar();
+  }
+
+  function updateProgressBar() {
+    const fill  = document.getElementById('pzbFill');
+    const label = document.getElementById('pzbLabel');
+    if (!fill || !label) return;
+    const done = getPuzzleProgress();
+    fill.style.width  = (done / PUZZLE_TOTAL * 100) + '%';
+    label.textContent = done + ' / ' + PUZZLE_TOTAL;
+  }
+
+  function stopPuzzle(doScatter) {
+    puzzleActive = false;
+    if (puzzleGhostEl) { puzzleGhostEl.remove(); puzzleGhostEl = null; }
+    document.getElementById('puzzleThumb')?.remove();
+    document.getElementById('puzzleBar')?.remove();
+
+    blocks.slice(0, PUZZLE_N).forEach(bl => {
+      bl.classList.remove('puzzle-piece', 'pz-solved');
+      bl.removeEventListener('mousedown',  onPieceDown);
+      bl.removeEventListener('touchstart', onPieceDown);
+      bl.style.backgroundImage    = '';
+      bl.style.backgroundSize     = '';
+      bl.style.backgroundPosition = '';
+      bl._puzzleSolved = false;
+      const img = bl.querySelector('img');
+      if (img) img.style.opacity = '';
+    });
+    blocks.slice(PUZZLE_N).forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = ''; });
+
+    if (doScatter) {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      blocks.forEach(bl => {
+        bl.style.width  = bl._origWidth  || '';
+        bl.style.height = bl._origHeight || '';
+        const bw = bl.offsetWidth, bh = bl.offsetHeight;
+        const m = 24, rot = (Math.random() - 0.5) * 24;
+        bl._rot = rot;
+        const x = m + Math.random() * Math.max(0, vw - bw - m * 2);
+        const y = headerH + m + Math.random() * Math.max(0, vh - headerH - bh - m * 2);
+        bl.style.transition = 'left .55s cubic-bezier(.16,1,.3,1),top .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)';
+        bl.style.left      = x + 'px';
+        bl.style.top       = y + 'px';
+        bl.style.transform = `rotate(${rot}deg)`;
+        setTimeout(() => { bl.style.transition = ''; }, 620);
+      });
+    }
+  }
+
+  function onPieceDown(e) {
+    if (!puzzleActive) return;
+    const bl = e.currentTarget;
+    if (bl._puzzleSolved) return;
+    e.preventDefault(); e.stopPropagation();
+    const { x, y } = getXY(e);
+    pzPiece = bl; pzMx0 = x; pzMy0 = y;
+    pzLeft0 = parseFloat(bl.style.left) || 0;
+    pzTop0  = parseFloat(bl.style.top)  || 0;
+    bl.style.zIndex    = String(++topZ);
+    bl.style.transform = 'scale(1.06) rotate(0deg)';
+    playPickup();
+    window.addEventListener('mousemove', onPieceMove);
+    window.addEventListener('mouseup',   onPieceUp);
+    window.addEventListener('touchmove', onPieceMove, { passive: false });
+    window.addEventListener('touchend',  onPieceUp);
+  }
+
+  function onPieceMove(e) {
+    if (!pzPiece) return;
+    e.preventDefault();
+    const { x, y } = getXY(e);
+    pzPiece.style.left = (pzLeft0 + x - pzMx0) + 'px';
+    pzPiece.style.top  = (pzTop0  + y - pzMy0) + 'px';
+  }
+
+  function onPieceUp() {
+    if (!pzPiece) return;
+    const bl = pzPiece;
+    pzPiece = null;
+    window.removeEventListener('mousemove', onPieceMove);
+    window.removeEventListener('mouseup',   onPieceUp);
+    window.removeEventListener('touchmove', onPieceMove);
+    window.removeEventListener('touchend',  onPieceUp);
+
+    const idx  = bl._puzzleIdx;
+    const col  = idx % PUZZLE_COLS, row = Math.floor(idx / PUZZLE_COLS);
+    const tx   = pGridX + col * PIECE_W, ty = pGridY + row * PIECE_H;
+    const cx   = parseFloat(bl.style.left) + PIECE_W / 2;
+    const cy   = parseFloat(bl.style.top)  + PIECE_H / 2;
+    const dist = Math.hypot(cx - (tx + PIECE_W / 2), cy - (ty + PIECE_H / 2));
+
+    if (dist < SNAP_DIST) {
+      bl.style.transition = 'left .16s ease-out,top .16s ease-out,transform .16s ease-out';
+      bl.style.left      = tx + 'px';
+      bl.style.top       = ty + 'px';
+      bl.style.transform = 'none';
+      bl.style.zIndex    = '6';
+      bl._puzzleSolved   = true;
+      bl.classList.add('pz-solved');
+      setTimeout(() => { bl.style.transition = ''; }, 180);
+      const cell = document.getElementById('pgc-' + idx);
+      if (cell) cell.classList.add('filled');
+      playDrop();
+      if (++puzzleSolved === PUZZLE_N) onImageComplete();
+    } else {
+      bl.style.transform = `rotate(${(Math.random() - 0.5) * 10}deg)`;
+    }
+  }
+
+  function onImageComplete() {
+    [330, 440, 550, 660, 880].forEach((f, i) =>
+      setTimeout(() => playTone(f, f * 1.05, 0.22, 0.18), i * 100)
+    );
+    const newDone = puzzleImgIdx + 1;
+    setPuzzleProgress(newDone);
+    updateProgressBar();
+
+    if (newDone >= PUZZLE_TOTAL) {
+      const msg = document.createElement('div');
+      msg.className = 'chaos-hint';
+      msg.textContent = 'All done! 🏆';
+      document.body.appendChild(msg);
+      setTimeout(() => {
+        msg.style.opacity = '0';
+        setTimeout(() => msg.remove(), 700);
+        setBtnText(puzzleBtn, 'Put It Together');
+        stopPuzzle(true);
+      }, 2800);
+    } else {
+      const msg = document.createElement('div');
+      msg.className = 'chaos-hint';
+      msg.textContent = newDone + ' / ' + PUZZLE_TOTAL + ' ✓';
+      document.body.appendChild(msg);
+      setTimeout(() => { msg.style.opacity = '0'; setTimeout(() => msg.remove(), 600); }, 1300);
+
+      setTimeout(() => {
+        puzzleImgIdx = newDone;
+        blocks.slice(0, PUZZLE_N).forEach((bl, i) => {
+          bl.removeEventListener('mousedown',  onPieceDown);
+          bl.removeEventListener('touchstart', onPieceDown);
+          const d = i * 35;
+          bl.style.transition = `transform .3s ${d}ms ease-in, opacity .28s ${d}ms ease-in`;
+          bl.style.transform = 'scale(0) rotate(200deg)';
+          bl.style.opacity   = '0';
+          setTimeout(() => { bl.style.transition = ''; }, 340 + d);
+        });
+        setTimeout(() => loadPuzzleImage(puzzleImgIdx), 520);
+      }, 1700);
+    }
+  }
+
+  function showPuzzleTip() {
+    if (chaosTip) chaosTip.remove();
+    chaosTip = document.createElement('div');
+    chaosTip.className = 'chaos-hint';
+    chaosTip.innerHTML = `Image ${puzzleImgIdx + 1} of ${PUZZLE_TOTAL} — drag pieces to rebuild<span>Drop near the correct spot to snap &middot; Click to dismiss</span>`;
+    document.body.appendChild(chaosTip);
+    setTimeout(() => { document.addEventListener('click', dismissTip, { once: true }); }, 500);
+  }
+
+
+  /* ═══════════════════════════════════════════
+     QUIZ MODE
+  ═══════════════════════════════════════════ */
+  const QUIZ_QUESTIONS = [
+    { q: "What's Danilo's primary design tool?",
+      opts: ["Adobe XD", "Sketch", "Canva", "Figma"], a: 3 },
+    { q: "How many years of UX/UI experience does Danilo have?",
+      opts: ["4 years", "1 year", "8 years", "10 years"], a: 0 },
+    { q: "Which studio does Danilo currently create amazing stuff at?",
+      opts: ["Pentagram", "Supercluster Studio", "Fantasy Inc.", "IDEO"], a: 1 },
+    { q: "Danilo redesigned the digital experience for which furniture brand?",
+      opts: ["IKEA", "CB2", "Hooker Furniture", "Herman Miller"], a: 2 },
+    { q: "According to Danilo, design is...",
+      opts: ["A luxury", "A hobby", "A conformity", "A necessity"], a: 3 },
+    { q: "Which financial planning website did Danilo design and build?",
+      opts: ["Vanguard Planning", "Betterment Pro", "Laurel Wealth Planning", "Fidelity Direct"], a: 2 },
+    { q: "What does Danilo obsess over in his work?",
+      opts: ["Speed over quality", "Every detail", "Dark mode only", "Typography only"], a: 1 },
+    { q: "What interactive game is hidden on Danilo's Playground page?",
+      opts: ["Chess", "Tetris", "Snake", "Pool / Billiards"], a: 3 },
+    { q: "What three pillars guide Danilo's design decisions?",
+      opts: ["Speed, budget, trends", "Aesthetics, shadows, fonts", "Usability, business goals, visual clarity", "Color, motion, iconography"], a: 2 },
+    { q: "On the Laurel Wealth Planning project, Danilo collaborated with...",
+      opts: ["Marija Radulovic", "Jovana Culibrk", "He worked solo", "A full agency"], a: 1 },
+  ];
+
+  let quizIdx     = 0;
+  let quizScore   = 0;
+  let quizAnswers = [];
+  let quizOverlay = null;
+
+  const quizBtn = document.getElementById('quizBtn');
+  if (quizBtn) {
+    quizBtn.addEventListener('click', () => {
+      if (poolActive)   { poolActive   = false; setBtnText(chaosBtn, "Let's Shoot Some Pool"); stopPool(); }
+      if (puzzleActive) { puzzleActive = false; setBtnText(puzzleBtn, 'Put It Together'); stopPuzzle(false); }
+      quizActive = !quizActive;
+      if (quizActive) startQuiz(); else closeQuiz();
+    });
+  }
+
+  function startQuiz() {
+    quizIdx = 0; quizScore = 0; quizAnswers = [];
+    quizOverlay = document.createElement('div');
+    quizOverlay.className = 'quiz-overlay';
+    quizOverlay.id = 'quizOverlay';
+    quizOverlay.innerHTML = `
+      <div class="quiz-card">
+        <button class="quiz-close-btn" id="quizCloseBtn">×</button>
+        <div class="quiz-header">
+          <span class="quiz-counter" id="qCounter">1 / ${QUIZ_QUESTIONS.length}</span>
+          <div class="quiz-prog-wrap"><div class="quiz-prog-fill" id="qProg"></div></div>
+          <span class="quiz-score-display" id="qScore">0 pts</span>
+        </div>
+        <p class="quiz-q" id="qText"></p>
+        <div class="quiz-opts" id="qOpts"></div>
+      </div>`;
+    document.body.appendChild(quizOverlay);
+    document.getElementById('quizCloseBtn').addEventListener('click', () => {
+      quizActive = false; closeQuiz();
+    });
+    renderQuestion(0);
+  }
+
+  function closeQuiz() {
+    quizActive = false;
+    if (quizOverlay) { quizOverlay.remove(); quizOverlay = null; }
+  }
+
+  function renderQuestion(idx) {
+    const q = QUIZ_QUESTIONS[idx];
+    document.getElementById('qCounter').textContent  = `${idx + 1} / ${QUIZ_QUESTIONS.length}`;
+    document.getElementById('qProg').style.width     = ((idx / QUIZ_QUESTIONS.length) * 100) + '%';
+    document.getElementById('qScore').textContent    = quizScore + ' pts';
+    document.getElementById('qText').textContent     = q.q;
+    const optsEl = document.getElementById('qOpts');
+    optsEl.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className   = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => selectAnswer(i));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(chosen) {
+    const q    = QUIZ_QUESTIONS[quizIdx];
+    const opts = document.querySelectorAll('.quiz-opt');
+    opts.forEach(b => b.disabled = true);
+    const correct = (chosen === q.a);
+    opts[chosen].classList.add(correct ? 'is-correct' : 'is-wrong');
+    if (!correct) opts[q.a].classList.add('is-correct');
+    if (correct) quizScore++;
+    quizAnswers.push({ q: q.q, opts: q.opts, chosen, correct: q.a });
+    playTone(correct ? 660 : 180, correct ? 880 : 120, 0.15, 0.18);
+    setTimeout(() => {
+      quizIdx++;
+      if (quizIdx < QUIZ_QUESTIONS.length) {
+        renderQuestion(quizIdx);
+      } else {
+        showQuizResults();
+      }
+    }, 1200);
+  }
+
+  function getScoreLabel() {
+    if (quizScore === 10) return "Perfect! You clearly did your research.";
+    if (quizScore >= 8)   return "Impressive. You know your stuff.";
+    if (quizScore >= 6)   return "Solid effort. Not bad at all.";
+    if (quizScore >= 4)   return "Room to grow. Maybe read the portfolio again?";
+    return "Time to do some research before that interview.";
+  }
+
+  function showQuizResults() {
+    const card = quizOverlay.querySelector('.quiz-card');
+    card.innerHTML = `
+      <button class="quiz-close-btn" id="quizCloseBtn2">×</button>
+      <div class="quiz-results">
+        <div class="quiz-big-score">${quizScore}<span>/ 10</span></div>
+        <span class="quiz-score-label">${getScoreLabel()}</span>
+        <div class="quiz-actions">
+          <button class="quiz-act-btn quiz-act-btn--green" id="qDownload">Download PDF</button>
+          <button class="quiz-act-btn quiz-act-btn--dark" id="qEmail">Email Yourself</button>
+          <button class="quiz-act-btn quiz-act-btn--dark" id="qRetry">Try Again</button>
+        </div>
+      </div>`;
+    document.getElementById('quizCloseBtn2').addEventListener('click', () => { quizActive = false; closeQuiz(); });
+    document.getElementById('qDownload').addEventListener('click', printQuizResults);
+    document.getElementById('qEmail').addEventListener('click', emailQuizResults);
+    document.getElementById('qRetry').addEventListener('click', () => { closeQuiz(); quizActive = true; startQuiz(); });
+    playTone(440, 880, 0.4, 0.2);
+  }
+
+  function printQuizResults() {
+    const el = document.createElement('div');
+    el.id = 'quizPrint';
+    const rows = quizAnswers.map((a, i) => {
+      const ok = a.chosen === a.correct;
+      return `<div style="margin-bottom:12px;padding:10px 14px;border-radius:8px;background:${ok ? '#f0f5e6' : '#fff0f0'};border-left:3px solid ${ok ? '#8ba444' : '#e05050'}">
+        <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:3px;">${i+1}. ${a.q}</div>
+        <div style="font-size:11px;color:${ok ? '#6a8a32' : '#e05050'}">${ok ? '✓' : '✗'} ${a.opts[a.chosen]}</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:40px 20px;color:#161518">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:12px">Danilo Hinic · Portfolio Quiz</div>
+        <div style="font-size:72px;font-weight:700;line-height:1;color:#161518">${quizScore}<span style="font-size:28px;color:#aaa">/10</span></div>
+        <div style="font-size:13px;color:#666;margin-top:6px">${getScoreLabel()}</div>
+        <div style="font-size:10px;color:#bbb;margin-top:4px">${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</div>
+      </div>
+      <div style="border-top:1px solid #eee;padding-top:20px">${rows}</div>
+      <div style="text-align:center;margin-top:20px;font-size:9px;color:#ccc">danilotools.github.io/portfolio</div>
+    </div>`;
+    document.body.appendChild(el);
+    window.print();
+    setTimeout(() => el.remove(), 1200);
+  }
+
+  function emailQuizResults() {
+    const subj = encodeURIComponent(`Danilo Hinic Quiz — I scored ${quizScore}/10`);
+    const body = encodeURIComponent(`I scored ${quizScore}/10 on Danilo Hinic's portfolio quiz!\n\n${getScoreLabel()}\n\nCheck out his portfolio: https://danilotools.github.io/portfolio/`);
+    window.open(`mailto:?subject=${subj}&body=${body}`);
+  }
 
 })();
