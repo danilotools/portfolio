@@ -786,8 +786,18 @@
     setBtnText(hotBtn, 'Stop Game');
     hotScore = 0; hotLives = 3; hotDuration = 2500;
     buildHotHUD();
+    showHotTip();
     pickNextHot(null);
     hotRaf = requestAnimationFrame(hotFrame);
+  }
+
+  function showHotTip() {
+    if (chaosTip) chaosTip.remove();
+    chaosTip = document.createElement('div');
+    chaosTip.className = 'chaos-hint';
+    chaosTip.innerHTML = 'Tap the glowing image before the timer runs out<span>Speed increases with each hit &middot; 3 lives &middot; Click to dismiss</span>';
+    document.body.appendChild(chaosTip);
+    setTimeout(() => { document.addEventListener('click', dismissTip, { once: true }); }, 500);
   }
 
   function stopHotPotato() {
@@ -797,6 +807,17 @@
     if (hotRaf)   { cancelAnimationFrame(hotRaf); hotRaf = null; }
     clearHotBlock();
     if (hotHUD) { hotHUD.remove(); hotHUD = null; }
+    restoreBlocks();
+  }
+
+  function restoreBlocks() {
+    blocks.forEach(b => {
+      b.style.transition    = 'opacity .35s ease, transform .35s ease';
+      b.style.opacity       = '1';
+      b.style.transform     = `rotate(${b._rot || 0}deg)`;
+      b.style.pointerEvents = '';
+      setTimeout(() => { b.style.transition = ''; }, 400);
+    });
   }
 
   function buildHotHUD() {
@@ -810,11 +831,11 @@
 
   function refreshHUD() {
     if (!hotHUD) return;
-    const dots = '●'.repeat(hotLives) + '○'.repeat(3 - hotLives);
+    const hearts = '♥'.repeat(hotLives) + '♡'.repeat(3 - hotLives);
     hotHUD.innerHTML = `
       <span class="hot-score">${hotScore}</span>
       <div class="hot-timer-bar"><div class="hot-timer-fill" id="hotFill"></div></div>
-      <span class="hot-lives">${dots}</span>`;
+      <span class="hot-lives">${hearts}</span>`;
   }
 
   function clearHotBlock() {
@@ -828,7 +849,9 @@
 
   function pickNextHot(prev) {
     clearHotBlock();
-    const pool = blocks.length > 1 ? blocks.filter(b => b !== prev) : blocks;
+    const visible = blocks.filter(b => b.style.opacity !== '0');
+    const pool = visible.length > 1 ? visible.filter(b => b !== prev) : visible;
+    if (!pool.length) return;
     hotBlock = pool[Math.floor(Math.random() * pool.length)];
     hotBlock.classList.add('hot-potato-active');
     hotBlock.addEventListener('click',    onHotClick,  { once: true });
@@ -849,8 +872,25 @@
     hotScore++;
     hotDuration = Math.max(550, hotDuration - 75);
     playTone(520, 660, 0.07, 0.18);
+    const clicked = hotBlock;
+    clicked.classList.remove('hot-potato-active');
+    clicked.style.transition = 'opacity .25s ease, transform .25s ease';
+    clicked.style.opacity    = '0';
+    clicked.style.transform  = 'scale(0.85)';
+    clicked.style.pointerEvents = 'none';
+    hotBlock = null;
     refreshHUD();
-    pickNextHot(hotBlock);
+    const remaining = blocks.filter(b => b.style.opacity !== '0' && b !== clicked);
+    if (remaining.length === 0) {
+      // all cleared — restore and keep playing
+      blocks.forEach(b => {
+        b.style.transition  = 'opacity .35s ease, transform .35s ease';
+        b.style.opacity     = '1';
+        b.style.transform   = `rotate(${b._rot || 0}deg)`;
+        b.style.pointerEvents = '';
+      });
+    }
+    pickNextHot(clicked);
   }
 
   function onHotMiss() {
@@ -863,6 +903,7 @@
       if (hotRaf) { cancelAnimationFrame(hotRaf); hotRaf = null; }
       if (hotHUD) { hotHUD.remove(); hotHUD = null; }
       setBtnText(hotBtn, 'Hot Potato');
+      restoreBlocks();
       const msg = document.createElement('div');
       msg.className = 'chaos-hint';
       msg.innerHTML = `Game over &middot; ${hotScore} pts<span>click Hot Potato to play again</span>`;
