@@ -215,6 +215,63 @@
       text-transform: uppercase;
     }
 
+    /* ── Hot Potato ── */
+    .hot-potato-active {
+      outline: 3px solid #c7d59f !important;
+      outline-offset: 4px;
+      box-shadow: 0 0 24px rgba(199, 213, 159, 0.5) !important;
+      z-index: 999 !important;
+      animation: hp-pulse 0.45s ease-in-out infinite alternate;
+      cursor: pointer !important;
+    }
+    @keyframes hp-pulse {
+      from { outline-color: #c7d59f; box-shadow: 0 0 16px rgba(199, 213, 159, 0.35); }
+      to   { outline-color: #e8f0c0; box-shadow: 0 0 36px rgba(199, 213, 159, 0.75); }
+    }
+    .hot-hud {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      background: rgba(22, 21, 24, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 40px;
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      pointer-events: none;
+    }
+    .hot-score {
+      font-family: 'General Sans', 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      min-width: 22px;
+      text-align: center;
+    }
+    .hot-timer-bar {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .hot-timer-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 2px;
+      background: #c7d59f;
+    }
+    .hot-lives {
+      font-size: 8px;
+      letter-spacing: 3px;
+      color: #c7d59f;
+    }
+
   </style>
 </head>
 <body id="playground" class="playground-page">
@@ -332,6 +389,7 @@
 
     <button class="scatter-btn" id="scatterBtn"><span class="btn-icon">🎱</span><span class="btn-text">Let's Shoot Some Pool</span></button>
     <button class="scatter-btn" id="quizBtn"><span class="btn-icon">❓</span><span class="btn-text">How Well Do You Know Danilo?</span></button>
+    <button class="scatter-btn" id="hotPotatoBtn"><span class="btn-icon">🥔</span><span class="btn-text">Hot Potato</span></button>
 
     <!-- Music Player: [Info] | [Controls] | [Progress] -->
     <div class="music-player" id="musicPlayer" style="display:none">

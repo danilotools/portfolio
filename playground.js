@@ -63,8 +63,9 @@
   /* ── Drag (normal mode) ── */
   let active = null, startMx = 0, startMy = 0, startLeft = 0, startTop = 0;
   let lastX = 0, lastY = 0, velX = 0, velY = 0, didDrag = false, topZ = 10;
-  let poolActive  = false;
-  let quizActive  = false;
+  let poolActive       = false;
+  let quizActive       = false;
+  let hotPotatoActive  = false;
   const DRAG_SCALE = isMobile ? 1.35 : 1.8;
   const throwRAFs  = new WeakMap();
 
@@ -79,7 +80,7 @@
   }
 
   function onDown(e) {
-    if (poolActive || quizActive) return;
+    if (poolActive || quizActive || hotPotatoActive) return;
     if (e.button && e.button !== 0) return;
     e.preventDefault();
     const raf = throwRAFs.get(e.currentTarget);
@@ -199,6 +200,7 @@
   /* ── Button ── */
   if (chaosBtn) {
     chaosBtn.addEventListener('click', () => {
+      if (hotPotatoActive) stopHotPotato();
       poolActive = !poolActive;
       setBtnText(chaosBtn, poolActive ? 'Stop the game' : "Let's Shoot Some Pool");
       poolActive ? startPool() : stopPool();
@@ -627,7 +629,8 @@
   const quizBtn = document.getElementById('quizBtn');
   if (quizBtn) {
     quizBtn.addEventListener('click', () => {
-      if (poolActive) { poolActive = false; setBtnText(chaosBtn, "Let's Shoot Some Pool"); stopPool(); }
+      if (poolActive)      { poolActive = false; setBtnText(chaosBtn, "Let's Shoot Some Pool"); stopPool(); }
+      if (hotPotatoActive) stopHotPotato();
       quizActive = !quizActive;
       if (quizActive) startQuiz(); else closeQuiz();
     });
@@ -755,6 +758,131 @@
     const subj = encodeURIComponent(`Danilo Hinic Quiz — I scored ${quizScore}/10`);
     const body = encodeURIComponent(`I scored ${quizScore}/10 on Danilo Hinic's portfolio quiz!\n\n${getScoreLabel()}\n\nCheck out his portfolio: https://danilotools.github.io/portfolio/`);
     window.open(`mailto:?subject=${subj}&body=${body}`);
+  }
+
+  /* ═══════════════════════════════════════════
+     HOT POTATO MODE
+  ═══════════════════════════════════════════ */
+  let hotBlock    = null;
+  let hotTimer    = null;
+  let hotRaf      = null;
+  let hotScore    = 0;
+  let hotLives    = 3;
+  let hotDuration = 2500;   // ms per round, shrinks on each hit
+  let hotStart    = 0;
+  let hotHUD      = null;
+
+  const hotBtn = document.getElementById('hotPotatoBtn');
+  if (hotBtn) {
+    hotBtn.addEventListener('click', () => {
+      if (poolActive)  { poolActive  = false; setBtnText(chaosBtn, "Let's Shoot Some Pool"); stopPool(); }
+      if (quizActive)  { quizActive  = false; closeQuiz(); }
+      hotPotatoActive = !hotPotatoActive;
+      if (hotPotatoActive) startHotPotato(); else stopHotPotato();
+    });
+  }
+
+  function startHotPotato() {
+    setBtnText(hotBtn, 'Stop Game');
+    hotScore = 0; hotLives = 3; hotDuration = 2500;
+    buildHotHUD();
+    pickNextHot(null);
+    hotRaf = requestAnimationFrame(hotFrame);
+  }
+
+  function stopHotPotato() {
+    setBtnText(hotBtn, 'Hot Potato');
+    hotPotatoActive = false;
+    if (hotTimer) { clearTimeout(hotTimer); hotTimer = null; }
+    if (hotRaf)   { cancelAnimationFrame(hotRaf); hotRaf = null; }
+    clearHotBlock();
+    if (hotHUD) { hotHUD.remove(); hotHUD = null; }
+  }
+
+  function buildHotHUD() {
+    if (hotHUD) hotHUD.remove();
+    hotHUD = document.createElement('div');
+    hotHUD.className = 'hot-hud';
+    hotHUD.id = 'hotHUD';
+    document.body.appendChild(hotHUD);
+    refreshHUD();
+  }
+
+  function refreshHUD() {
+    if (!hotHUD) return;
+    const dots = '●'.repeat(hotLives) + '○'.repeat(3 - hotLives);
+    hotHUD.innerHTML = `
+      <span class="hot-score">${hotScore}</span>
+      <div class="hot-timer-bar"><div class="hot-timer-fill" id="hotFill"></div></div>
+      <span class="hot-lives">${dots}</span>`;
+  }
+
+  function clearHotBlock() {
+    if (hotBlock) {
+      hotBlock.classList.remove('hot-potato-active');
+      hotBlock.removeEventListener('click',      onHotClick);
+      hotBlock.removeEventListener('touchend',   onHotTouch);
+      hotBlock = null;
+    }
+  }
+
+  function pickNextHot(prev) {
+    clearHotBlock();
+    const pool = blocks.length > 1 ? blocks.filter(b => b !== prev) : blocks;
+    hotBlock = pool[Math.floor(Math.random() * pool.length)];
+    hotBlock.classList.add('hot-potato-active');
+    hotBlock.addEventListener('click',    onHotClick,  { once: true });
+    hotBlock.addEventListener('touchend', onHotTouch,  { once: true });
+    hotStart = performance.now();
+    if (hotTimer) clearTimeout(hotTimer);
+    hotTimer = setTimeout(onHotMiss, hotDuration);
+  }
+
+  function onHotTouch(e) {
+    e.preventDefault();
+    onHotClick(e);
+  }
+
+  function onHotClick() {
+    if (!hotPotatoActive) return;
+    clearTimeout(hotTimer);
+    hotScore++;
+    hotDuration = Math.max(550, hotDuration - 75);
+    playTone(520, 660, 0.07, 0.18);
+    refreshHUD();
+    pickNextHot(hotBlock);
+  }
+
+  function onHotMiss() {
+    if (!hotPotatoActive) return;
+    hotLives--;
+    playTone(130, 65, 0.3, 0.22);
+    if (hotLives <= 0) {
+      hotPotatoActive = false;
+      clearHotBlock();
+      if (hotRaf) { cancelAnimationFrame(hotRaf); hotRaf = null; }
+      if (hotHUD) { hotHUD.remove(); hotHUD = null; }
+      setBtnText(hotBtn, 'Hot Potato');
+      const msg = document.createElement('div');
+      msg.className = 'chaos-hint';
+      msg.innerHTML = `Game over &middot; ${hotScore} pts<span>click Hot Potato to play again</span>`;
+      document.body.appendChild(msg);
+      setTimeout(() => { msg.style.opacity = '0'; setTimeout(() => msg.remove(), 750); }, 2800);
+      return;
+    }
+    refreshHUD();
+    pickNextHot(hotBlock);
+  }
+
+  function hotFrame(now) {
+    if (!hotPotatoActive) return;
+    const fill = document.getElementById('hotFill');
+    if (fill) {
+      const pct = Math.max(0, 1 - (now - hotStart) / hotDuration);
+      fill.style.width = (pct * 100) + '%';
+      fill.style.background = pct > 0.4 ? '#c7d59f' : pct > 0.2 ? '#d4a84b' : '#e05050';
+    }
+    hotRaf = requestAnimationFrame(hotFrame);
   }
 
 })();
