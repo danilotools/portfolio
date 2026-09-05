@@ -110,6 +110,45 @@ html, body {
   transition: background 0.2s;
 }
 .btn-dark:hover { background: #333330; }
+.btn-dark:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+
+.email-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 20000;
+  max-width: calc(100vw - 32px);
+  padding: 12px 20px;
+  border: 1px solid rgba(199, 213, 159, 0.25);
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--black);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.email-toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) {
+  .email-toast { transition: none; }
+}
+
+.fuel-coming-soon {
+  min-height: 420px;
+  padding: clamp(24px, 6vw, 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  border-radius: 20px;
+  background: var(--dark-card);
+}
+.fuel-coming-soon-label { color: var(--green); font-size: 14px; }
+.fuel-coming-soon h1 { font-family: 'General Sans', sans-serif; font-size: clamp(36px, 6vw, 64px); }
+.fuel-coming-soon p { color: var(--muted); line-height: 1.6; }
 
 /* ── HERO ── */
 .hero {
@@ -263,13 +302,13 @@ html, body {
   max-width: none;
 }
 
-/* Claude — no background, full image */
-.icon-badge--claude {
+/* Codex — no background, full image */
+.icon-badge--codex {
   transform: rotate(12deg);
 }
-.icon-wrap--2:hover .icon-badge--claude { transform: rotate(12deg) scale(1.15); }
+.icon-wrap--2:hover .icon-badge--codex { transform: rotate(12deg) scale(1.15); }
 
-.icon-badge--claude img {
+.icon-badge--codex img {
   position: absolute;
   display: block;
   width: 100%;
@@ -520,14 +559,14 @@ a.underline-link {
   pointer-events: none;
 }
 
-/* Supercluster — dark bg, sprite crop matching Figma */
+/* Fuel Results project badge */
 .project-icon.icon--sc {
   background: #000;
   padding: 4px;
 }
 .card-icon-inner-sc {
-  width: 23px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -537,7 +576,7 @@ a.underline-link {
   height: 100%;
   left: 0;
   top: 0;
-  width: 113.79%;
+  width: 100%;
   max-width: none;
   pointer-events: none;
 }
@@ -697,7 +736,7 @@ a.underline-link {
   pointer-events: none;
 }
 
-/* Supercluster — dark bg, border, sprite */
+/* Fuel Results selector badge */
 .avatar-circle--sc {
   background: #000;
   border: 2px solid #222124;
@@ -712,8 +751,8 @@ a.underline-link {
 }
 /* 23x16px window, same as Figma */
 .avatar-crop-sc {
-  width: 23px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -723,7 +762,7 @@ a.underline-link {
   height: 100%;
   left: 0;
   top: 0;
-  width: 113.79%;
+  width: 100%;
   max-width: none;
   pointer-events: none;
 }

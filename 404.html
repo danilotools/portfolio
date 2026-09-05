@@ -72,11 +72,10 @@
       </button>
       <a href="index.html" class="nav-link">Home</a>
       <a href="playground.html" class="nav-link">Playground</a>
-      <a href="resume.html" class="nav-link">Resume</a>
     </nav>
     <a href="index.html" class="logo-dot" aria-label="Home"></a>
     <div class="header-right">
-      <a href="mailto:danilophinic@gmail.com" class="btn-dark">Get in Touch</a>
+      <button type="button" class="btn-dark" data-copy-email>Copy email</button>
     </div>
   </header>
 
@@ -84,7 +83,6 @@
     <nav class="mobile-menu-nav">
       <a href="index.html" class="mobile-menu-link">Home</a>
       <a href="playground.html" class="mobile-menu-link">Playground</a>
-      <a href="resume.html" class="mobile-menu-link">Resume</a>
     </nav>
   </div>
 
@@ -100,16 +98,6 @@
     <div class="transition-box"></div>
   </div>
 
-  <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileMenu = document.getElementById('mobileMenu');
-    if (menuToggle && mobileMenu) {
-      menuToggle.addEventListener('click', () => {
-        const open = mobileMenu.classList.toggle('is-open');
-        menuToggle.setAttribute('aria-expanded', open);
-      });
-    }
-  </script>
   <script src="transition.js"></script>
 </body>
 </html>

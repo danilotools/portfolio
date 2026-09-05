@@ -1,3 +1,55 @@
+/* Shared email-copy button and accessible toast. */
+(function () {
+  const buttons = document.querySelectorAll('[data-copy-email]');
+  if (!buttons.length) return;
+
+  const email = 'danilophinic@gmail.com';
+  const toast = document.createElement('div');
+  toast.className = 'email-toast';
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.setAttribute('aria-atomic', 'true');
+  document.body.appendChild(toast);
+  let hideTimer;
+
+  function fallbackCopy() {
+    const previousFocus = document.activeElement;
+    const field = document.createElement('textarea');
+    field.value = email;
+    field.setAttribute('readonly', '');
+    field.style.cssText = 'position:fixed;left:-9999px;top:0;font-size:16px';
+    document.body.appendChild(field);
+    field.select();
+    try {
+      if (!document.execCommand('copy')) throw new Error('Copy unavailable');
+    } finally {
+      field.remove();
+      if (previousFocus) previousFocus.focus({ preventScroll: true });
+    }
+  }
+
+  buttons.forEach(button => button.addEventListener('click', async () => {
+    let message = 'email copied';
+    try {
+      try {
+        if (!navigator.clipboard || !window.isSecureContext) throw new Error('Use fallback');
+        await navigator.clipboard.writeText(email);
+      } catch (_) {
+        fallbackCopy();
+      }
+    } catch (_) {
+      message = 'Copy unavailable — ' + email;
+    }
+    clearTimeout(hideTimer);
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    hideTimer = setTimeout(() => {
+      toast.classList.remove('is-visible');
+      toast.textContent = '';
+    }, message === 'email copied' ? 2500 : 6000);
+  }));
+})();
+
 /* ── Smooth scroll (Lenis) ──────────────────────────────────────── */
 (function () {
   if (document.body.classList.contains('playground-page')) return;

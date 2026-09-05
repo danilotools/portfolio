@@ -19,12 +19,12 @@ const PROJECTS = [
     link: 'project-lwp.html',
   },
   {
-    name: 'Supercluster Studio',
-    desc: 'Building tools for the future of creative work',
-    image: 'https://picsum.photos/seed/supercluster303/1200/674',
+    name: 'Fuel Results',
+    desc: 'Case study coming soon',
+    image: 'images/fuel-results-cover.svg',
     iconType: 'sc',
-    iconSrc: 'images/icons/avatar-supercluster.png',
-    link: 'project-supercluster.html',
+    iconSrc: 'images/icons/avatar-fuel-results.svg',
+    link: 'project-fuel-results.html',
   },
 ];
 

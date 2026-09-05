@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supercluster Studio — Danilo Hinić</title>
-  <meta name="description" content="Supercluster Studio project — UX/UI design case study by Danilo Hinić." />
+  <title>Fuel Results — Danilo Hinić</title>
+  <meta name="description" content="Fuel Results project — UX/UI design case study by Danilo Hinić." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -304,11 +304,10 @@
       </button>
       <a href="index.html" class="nav-link">Home</a>
       <a href="playground.html" class="nav-link">Playground</a>
-      <a href="resume.html" class="nav-link">Resume</a>
     </nav>
     <a href="index.html" class="logo-dot" aria-label="Home"></a>
     <div class="header-right">
-      <a href="mailto:danilophinic@gmail.com" class="btn-dark">Get in Touch</a>
+      <button type="button" class="btn-dark" data-copy-email>Copy email</button>
     </div>
   </header>
 
@@ -316,7 +315,6 @@
     <nav class="mobile-menu-nav">
       <a href="index.html" class="mobile-menu-link">Home</a>
       <a href="playground.html" class="mobile-menu-link">Playground</a>
-      <a href="resume.html" class="mobile-menu-link">Resume</a>
     </nav>
   </div>
 
@@ -330,73 +328,23 @@
 
         <div class="sp-project-identity">
           <div class="sp-icon">
-            <img src="images/icons/avatar-supercluster.png" alt="Supercluster Studio logo" />
+            <img src="images/icons/avatar-fuel-results.svg" alt="Fuel Results" />
           </div>
-          <span class="sp-project-name">Supercluster Studio</span>
+          <span class="sp-project-name">Fuel Results</span>
         </div>
 
-        <p class="sp-description">
-          A high-converting landing page for Supercluster Studio's Webflow offer — designed to communicate value clearly and drive action fast.
-        </p>
+        <p class="sp-description">Fuel Results — case study coming soon.</p>
 
-        <dl class="sp-meta">
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">What I Did</dt>
-            <dd class="sp-meta-value">Led UX/UI design from concept to handoff with <a href="https://www.linkedin.com/in/jovana-culibrk/" class="sp-collab-link" target="_blank" rel="noopener">Jovana Culibrk</a> — visual design, copywriting, and full Figma specs.</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Impact</dt>
-            <dd class="sp-meta-value">12 screens · Full Figma spec · Page live 1 week post-handoff</dd>
-          </div>
-
-          <div class="sp-meta-row">
-            <dt class="sp-meta-label">Live Site</dt>
-            <dd class="sp-meta-value">
-              <a href="https://supercluster.studio/webflow-landing-page-special-offer/" class="sp-meta-link" target="_blank" rel="noopener">
-                supercluster.studio
-                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                  <path d="M2 9L9 2M9 2H4.5M9 2V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
-            </dd>
-          </div>
-
-        </dl>
       </aside>
       </div>
 
       <!-- ── RIGHT: IMAGES ── -->
       <div class="sp-images">
 
-        <!-- Case Study -->
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-01/1200/720" alt="Supercluster Studio — Hero" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-02/1200/720" alt="Supercluster Studio — Work" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-03/1200/720" alt="Supercluster Studio — About" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-04/1200/720" alt="Supercluster Studio — Contact" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-05/1200/720" alt="Supercluster Studio — Services" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-06/1200/800" alt="Supercluster Studio — Mobile" />
-        </div>
-
-        <div class="sp-img-card sp-reveal">
-          <img src="https://picsum.photos/seed/sc-07/1200/720" alt="Supercluster Studio — Detail" />
+        <div class="fuel-coming-soon">
+          <span class="fuel-coming-soon-label">Fuel Results</span>
+          <h1>Coming soon.</h1>
+          <p>Project details and images are on the way.</p>
         </div>
 
       </div>
@@ -440,14 +388,6 @@
   </div>
 
   <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileMenu = document.getElementById('mobileMenu');
-    if (menuToggle && mobileMenu) {
-      menuToggle.addEventListener('click', () => {
-        const open = mobileMenu.classList.toggle('is-open');
-        menuToggle.setAttribute('aria-expanded', open);
-      });
-    }
 
     /* ── Scroll progress bar ── */
     const progressFill  = document.getElementById('spProgressFill');
