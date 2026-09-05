@@ -29,7 +29,7 @@
   }
 
   buttons.forEach(button => button.addEventListener('click', async () => {
-    let message = 'email copied';
+    let message = 'Email copied';
     try {
       try {
         if (!navigator.clipboard || !window.isSecureContext) throw new Error('Use fallback');
@@ -46,7 +46,7 @@
     hideTimer = setTimeout(() => {
       toast.classList.remove('is-visible');
       toast.textContent = '';
-    }, message === 'email copied' ? 2500 : 6000);
+    }, message === 'Email copied' ? 2500 : 6000);
   }));
 })();
 

@@ -118,11 +118,11 @@ html, body {
   left: 50%;
   z-index: 20000;
   max-width: calc(100vw - 32px);
-  padding: 12px 20px;
-  border: 1px solid rgba(199, 213, 159, 0.25);
+  padding: 10px 16px;
+  border: none;
   border-radius: 12px;
-  background: var(--green);
-  color: var(--black);
+  background: var(--dark-card);
+  color: var(--white);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   font-size: 14px;
   text-align: center;
@@ -136,19 +136,25 @@ html, body {
   .email-toast { transition: none; }
 }
 
-.fuel-coming-soon {
-  min-height: 420px;
-  padding: clamp(24px, 6vw, 72px);
+.fuel-image-placeholder {
+  aspect-ratio: 5 / 3;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 20px;
-  border-radius: 20px;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
   background: var(--dark-card);
+  color: var(--muted);
+  font-size: 14px;
 }
-.fuel-coming-soon-label { color: var(--green); font-size: 14px; }
-.fuel-coming-soon h1 { font-family: 'General Sans', sans-serif; font-size: clamp(36px, 6vw, 64px); }
-.fuel-coming-soon p { color: var(--muted); line-height: 1.6; }
+.fuel-image-placeholder strong {
+  color: var(--green);
+  font-family: 'General Sans', sans-serif;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 500;
+}
 
 /* ── HERO ── */
 .hero {
@@ -304,6 +310,8 @@ html, body {
 
 /* Codex — no background, full image */
 .icon-badge--codex {
+  border-radius: 50%;
+  overflow: hidden;
   transform: rotate(12deg);
 }
 .icon-wrap--2:hover .icon-badge--codex { transform: rotate(12deg) scale(1.15); }

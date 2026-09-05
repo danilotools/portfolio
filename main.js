@@ -13,14 +13,14 @@ const PROJECTS = [
   {
     name: 'Laurel Wealth Planning',
     desc: 'Redesigning the whole website from the ground up',
-    image: 'https://picsum.photos/seed/laurel202/1200/674',
+    image: 'images/laurel-wealth-planning/1.webp',
     iconType: 'laurel',
     iconSrc: 'images/icons/avatar-lwp.png',
     link: 'project-lwp.html',
   },
   {
     name: 'Fuel Results',
-    desc: 'Case study coming soon',
+    desc: 'Bringing a fresh brand identity to life online',
     image: 'images/fuel-results-cover.svg',
     iconType: 'sc',
     iconSrc: 'images/icons/avatar-fuel-results.svg',
