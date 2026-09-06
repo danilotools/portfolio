@@ -16,8 +16,8 @@
     .sp-page {
       padding-top: 80px;
       padding-bottom: 120px;
-      padding-left:  clamp(20px, 5vw, 80px);
-      padding-right: clamp(20px, 5vw, 80px);
+      padding-left: var(--side-pad);
+      padding-right: var(--side-pad);
     }
 
     .sp-grid {
@@ -46,7 +46,7 @@
     .sp-icon {
       width: 40px;
       height: 40px;
-      border-radius: 50%;
+      border-radius: 10px;
       overflow: hidden;
       flex-shrink: 0;
       background: #f4511e;
@@ -267,7 +267,7 @@
     }
 
     @media (max-width: 768px) {
-      .sp-page { padding-top: 100px; padding-bottom: 80px; }
+      .sp-page { padding-top: 20px; padding-bottom: 80px; }
       .sp-grid { grid-template-columns: 1fr; gap: 48px; }
       .sp-sidebar { position: static; }
     }
