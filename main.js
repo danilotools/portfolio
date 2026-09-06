@@ -3,6 +3,14 @@
 ───────────────────────────────────────────── */
 const PROJECTS = [
   {
+    name: 'Fuel Results',
+    desc: 'Bringing a fresh brand identity to life online',
+    image: 'images/fuel-results/cover.webp',
+    iconType: 'sc',
+    iconSrc: 'images/fuel-results/icon.webp',
+    link: 'project-fuel-results.html',
+  },
+  {
     name: 'Hooker Furniture',
     desc: 'Elevating home living through timeless, bold design',
     image: 'images/hooker-furniture/1.webp',
@@ -14,17 +22,10 @@ const PROJECTS = [
     name: 'Laurel Wealth Planning',
     desc: 'Redesigning the whole website from the ground up',
     image: 'images/laurel-wealth-planning/1.webp',
+    video: 'images/laurel-wealth-planning/hero.webm',
     iconType: 'laurel',
     iconSrc: 'images/icons/avatar-lwp.png',
     link: 'project-lwp.html',
-  },
-  {
-    name: 'Fuel Results',
-    desc: 'Bringing a fresh brand identity to life online',
-    image: 'images/fuel-results-cover.svg',
-    iconType: 'sc',
-    iconSrc: 'images/icons/avatar-fuel-results.svg',
-    link: 'project-fuel-results.html',
   },
 ];
 
@@ -33,6 +34,7 @@ const PROJECTS = [
 ───────────────────────────────────────────── */
 const card       = document.getElementById('projectCard');
 const cardBgImg  = document.getElementById('cardBgImg');
+const cardBgVideo = document.getElementById('cardBgVideo');
 const cardIcon   = document.getElementById('cardIcon');
 const cardTitle  = document.getElementById('cardTitle');
 const cardDesc   = document.getElementById('cardDesc');
@@ -64,7 +66,21 @@ function buildCardIcon(project) {
 function renderProject(index) {
   const p = PROJECTS[index];
 
-  cardBgImg.src   = p.image;
+  if (p.video) {
+    cardBgImg.hidden = true;
+    cardBgVideo.hidden = false;
+    cardBgVideo.poster = p.image;
+    if (cardBgVideo.getAttribute('src') !== p.video) {
+      cardBgVideo.src = p.video;
+      cardBgVideo.load();
+    }
+    cardBgVideo.play().catch(() => {});
+  } else {
+    cardBgVideo.pause();
+    cardBgVideo.hidden = true;
+    cardBgImg.hidden = false;
+    cardBgImg.src = p.image;
+  }
   cardTitle.textContent = p.name;
   cardDesc.textContent  = p.desc;
   sliderCount.textContent = `${index + 1} of ${PROJECTS.length}`;
