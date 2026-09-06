@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Laurel Wealth Planning — Danilo Hinić</title>
-  <meta name="description" content="Laurel Wealth Planning project — UX/UI design case study by Danilo Hinić." />
+  <meta name="description" content="Laurel Wealth Planning case study: UX strategy, visual design, and Webflow development for a clear, high-trust client experience." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,7 +32,8 @@
 
     .sp-sidebar {
       position: sticky;
-      top: 60px;
+      top: calc(var(--site-header-height, 128px) + 24px);
+      transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .sp-project-identity {
@@ -302,7 +303,6 @@
       transition: width 60ms linear;
     }
   </style>
-  <link rel="stylesheet" href="gallery.css" />
 </head>
 <body>
 
@@ -350,19 +350,19 @@
         </div>
 
         <p class="sp-description">
-          Redesigning the whole website from the ground up — crafting a trustworthy, modern digital experience for a wealth management firm.
+          Redesigned and built a financial-planning website that makes a complex, high-trust service feel clear, personal, and easy to navigate.
         </p>
 
         <dl class="sp-meta">
 
           <div class="sp-meta-row">
-            <dt class="sp-meta-label">What I Did</dt>
-            <dd class="sp-meta-value">UX strategy, visual design, and Webflow development with <a href="https://www.linkedin.com/in/jovana-culibrk/" class="sp-collab-link" target="_blank" rel="noopener">Jovana Culibrk</a> — full ownership from brand audit to live site.</dd>
+            <dt class="sp-meta-label">Role</dt>
+            <dd class="sp-meta-value">UX strategy, information architecture, visual design, and Webflow development—from the initial audit through launch.</dd>
           </div>
 
           <div class="sp-meta-row">
-            <dt class="sp-meta-label">Impact</dt>
-            <dd class="sp-meta-value">Site live on schedule · Bounce rate down ~18% · Mobile sessions up 24%</dd>
+            <dt class="sp-meta-label">Outcome</dt>
+            <dd class="sp-meta-value">A responsive, maintainable experience that helps prospective clients understand the firm, find relevant guidance, and take the next step with confidence.</dd>
           </div>
 
           <div class="sp-meta-row">
@@ -384,45 +384,37 @@
       <!-- ── RIGHT: IMAGES ── -->
       <div class="sp-images">
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/1.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 1">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/1.webp" alt="Laurel Wealth Planning — website design 1" width="2880" height="2160" loading="eager" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/2.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 2">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/2.webp" alt="Laurel Wealth Planning — website design 2" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/3.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 3">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/3.webp" alt="Laurel Wealth Planning — website design 3" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/4.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 4">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/4.webp" alt="Laurel Wealth Planning — website design 4" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/5.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 5">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/5.webp" alt="Laurel Wealth Planning — website design 5" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/6.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 6">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/6.webp" alt="Laurel Wealth Planning — website design 6" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/7.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 7">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/7.webp" alt="Laurel Wealth Planning — website design 7" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
 
-        <a class="sp-img-card sp-reveal gallery-card" href="images/laurel-wealth-planning/8.webp" data-gallery-image aria-label="View Laurel Wealth Planning image 8">
+        <div class="sp-img-card sp-reveal">
           <img src="images/laurel-wealth-planning/8.webp" alt="Laurel Wealth Planning — website design 8" width="2880" height="2160" loading="lazy" />
-          <span class="project-cursor gallery-cursor" aria-hidden="true">View Image</span>
-        </a>
+        </div>
       </div>
 
     </div>
@@ -483,6 +475,5 @@
     revealEls.forEach(el => obs.observe(el));
   </script>
   <script src="transition.js"></script>
-  <script src="gallery.js"></script>
 </body>
 </html>

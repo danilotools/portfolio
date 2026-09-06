@@ -617,8 +617,8 @@
       opts: ["Chess", "Tetris", "Snake", "Pool / Billiards"], a: 3 },
     { q: "What three pillars guide Danilo's design decisions?",
       opts: ["Speed, budget, trends", "Aesthetics, shadows, fonts", "Usability, business goals, visual clarity", "Color, motion, iconography"], a: 2 },
-    { q: "On the Laurel Wealth Planning project, Danilo collaborated with...",
-      opts: ["Marija Radulovic", "Jovana Culibrk", "He worked solo", "A full agency"], a: 1 },
+    { q: "Which disciplines did Danilo handle on Laurel Wealth Planning?",
+      opts: ["Logo design only", "UX, visual design, and Webflow development", "Photography only", "Paid advertising"], a: 1 },
   ];
 
   let quizIdx     = 0;

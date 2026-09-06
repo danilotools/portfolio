@@ -56,12 +56,17 @@
   const header = document.querySelector('.header');
   if (!header) return;
 
-  header.classList.add('site-header-solid');
-
-  // The Playground is a fixed canvas without a document scroll, so its header stays visible.
+  // The Playground is a fixed canvas, so its header remains transparent and always visible.
   if (document.body.classList.contains('playground-page')) return;
 
+  header.classList.add('site-header-solid');
   header.classList.add('site-header-autohide');
+  const setHeaderHeight = () => {
+    document.documentElement.style.setProperty('--site-header-height', `${header.offsetHeight}px`);
+  };
+  setHeaderHeight();
+  window.addEventListener('resize', setHeaderHeight, { passive: true });
+
   let lastY = Math.max(0, window.scrollY);
   let ticking = false;
 
@@ -71,8 +76,10 @@
 
     if (currentY <= 8 || menuIsOpen || currentY < lastY) {
       header.classList.remove('is-header-hidden');
+      document.body.classList.remove('header-is-hidden');
     } else if (currentY > lastY && currentY > header.offsetHeight) {
       header.classList.add('is-header-hidden');
+      document.body.classList.add('header-is-hidden');
     }
 
     lastY = currentY;

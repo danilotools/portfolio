@@ -27,6 +27,15 @@
       overflow: hidden;
     }
 
+    .playground-page .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1200;
+      background: transparent;
+    }
+
     /* Full-screen canvas for draggable blocks */
     .playground-field {
       position: fixed;
@@ -264,6 +273,29 @@
   </style>
 </head>
 <body id="playground" class="playground-page">
+
+  <header class="header">
+    <nav class="nav" aria-label="Primary navigation">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+        <span class="menu-toggle-bar"></span>
+      </button>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="playground.html" class="nav-link active">Playground</a>
+    </nav>
+    <a href="index.html" class="logo-dot" aria-label="Home"></a>
+    <div class="header-right">
+      <button type="button" class="btn-dark" data-copy-email>Get in touch</button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-menu-nav">
+      <a href="index.html" class="mobile-menu-link">Home</a>
+      <a href="playground.html" class="mobile-menu-link active">Playground</a>
+    </nav>
+  </div>
 
   <!-- PLAYGROUND CANVAS -->
   <main class="playground-field" id="playgroundField">

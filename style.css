@@ -79,6 +79,10 @@ html, body {
   transform: translateY(-100%);
 }
 
+body.header-is-hidden .sp-sidebar {
+  top: 24px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .header.site-header-autohide { transition: none; }
 }

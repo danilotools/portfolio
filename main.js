@@ -4,15 +4,16 @@
 const PROJECTS = [
   {
     name: 'Fuel Results',
-    desc: 'Bringing a fresh brand identity to life online',
+    desc: 'A conversion-focused website built to turn attention into action',
     image: 'images/fuel-results/cover.webp',
+    objectPosition: 'center top',
     iconType: 'sc',
     iconSrc: 'images/fuel-results/icon.webp',
     link: 'project-fuel-results.html',
   },
   {
     name: 'Hooker Furniture',
-    desc: 'Elevating home living through timeless, bold design',
+    desc: 'A digital flagship balancing brand storytelling and product discovery',
     image: 'images/hooker-furniture/1.webp',
     iconType: 'frame',
     iconSrc: 'images/icons/avatar-hooker.svg',
@@ -20,7 +21,7 @@ const PROJECTS = [
   },
   {
     name: 'Laurel Wealth Planning',
-    desc: 'Redesigning the whole website from the ground up',
+    desc: 'A high-trust financial website made clear, warm, and easy to navigate',
     image: 'images/laurel-wealth-planning/1.webp',
     video: 'images/laurel-wealth-planning/hero.webm',
     iconType: 'laurel',
@@ -81,6 +82,8 @@ function renderProject(index) {
     cardBgImg.hidden = false;
     cardBgImg.src = p.image;
   }
+  cardBgImg.style.objectPosition = p.objectPosition || 'center center';
+  cardBgVideo.style.objectPosition = p.objectPosition || 'center center';
   cardTitle.textContent = p.name;
   cardDesc.textContent  = p.desc;
   sliderCount.textContent = `${index + 1} of ${PROJECTS.length}`;
