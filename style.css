@@ -60,6 +60,29 @@ html, body {
   padding: 40px var(--side-pad);
 }
 
+/* Shared header behavior: stays out of the way while reading and returns on scroll-up. */
+.header.site-header-solid {
+  background: var(--black);
+}
+
+.header.site-header-autohide {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  animation: none;
+  transform: translateY(0);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.header.site-header-autohide.is-header-hidden {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header.site-header-autohide { transition: none; }
+}
+
 .nav {
   display: flex;
   gap: 40px;

@@ -50,6 +50,41 @@
   }));
 })();
 
+/* Shared header: hide while scrolling down, return as soon as scrolling reverses. */
+(function () {
+  const header = document.querySelector('.header');
+  if (!header) return;
+
+  header.classList.add('site-header-solid');
+
+  // The Playground is a fixed canvas without a document scroll, so its header stays visible.
+  if (document.body.classList.contains('playground-page')) return;
+
+  header.classList.add('site-header-autohide');
+  let lastY = Math.max(0, window.scrollY);
+  let ticking = false;
+
+  function updateHeader() {
+    const currentY = Math.max(0, window.scrollY);
+    const menuIsOpen = document.getElementById('menuToggle')?.getAttribute('aria-expanded') === 'true';
+
+    if (currentY <= 8 || menuIsOpen || currentY < lastY) {
+      header.classList.remove('is-header-hidden');
+    } else if (currentY > lastY && currentY > header.offsetHeight) {
+      header.classList.add('is-header-hidden');
+    }
+
+    lastY = currentY;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(updateHeader);
+  }, { passive: true });
+})();
+
 /* ── Smooth scroll (Lenis) ──────────────────────────────────────── */
 (function () {
   if (document.body.classList.contains('playground-page')) return;
