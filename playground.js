@@ -25,7 +25,7 @@
   function playPocket() { playTone(110, 55,  0.28, 0.30); }
 
   /* ── Layout constants ── */
-  const headerH  = (document.querySelector('.header') || {}).offsetHeight || 80;
+  const headerH  = document.querySelector('.header')?.offsetHeight || 0;
   const isMobile = window.innerWidth <= 768;
   const SCALE    = isMobile ? 0.69 : 1;
 
