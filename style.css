@@ -144,8 +144,8 @@ html, body {
   padding: 10px 16px;
   border: none;
   border-radius: 12px;
-  background: var(--dark-card);
-  color: var(--white);
+  background: var(--white);
+  color: var(--black);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   font-size: 14px;
   text-align: center;
@@ -1016,10 +1016,28 @@ a.underline-link {
 }
 
 .footer-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   color: var(--muted);
 }
+
+.footer-email {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.footer-email:hover { color: var(--white); }
+.footer-email:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
 
 .footer-links {
   display: flex;

@@ -4,6 +4,7 @@
   if (!buttons.length) return;
 
   const email = 'danilophinic@gmail.com';
+  const successMessage = `Email copied: ${email}`;
   const toast = document.createElement('div');
   toast.className = 'email-toast';
   toast.setAttribute('role', 'status');
@@ -29,7 +30,7 @@
   }
 
   buttons.forEach(button => button.addEventListener('click', async () => {
-    let message = 'Email copied';
+    let message = successMessage;
     try {
       try {
         if (!navigator.clipboard || !window.isSecureContext) throw new Error('Use fallback');
@@ -46,7 +47,7 @@
     hideTimer = setTimeout(() => {
       toast.classList.remove('is-visible');
       toast.textContent = '';
-    }, message === 'Email copied' ? 2500 : 6000);
+    }, message === successMessage ? 2500 : 6000);
   }));
 })();
 
